@@ -9,7 +9,8 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Private mlngStart As Long
 Private Declare Function GetTickCount Lib "kernel32" () As Long
-Function reCalculateRunTime(ByVal rowid, ByVal formulaCount)
+
+Function calculateRepeatedComputationTime(ByVal rowid, ByVal formulaCount)
     
 'Initialize Timer Variables (milliseconds version, more error prone I believe)
     Dim StartTime As Double
@@ -27,11 +28,6 @@ Function reCalculateRunTime(ByVal rowid, ByVal formulaCount)
     For J = 1 To 10
           
         StartTime = GetTickCount
-        'Cells(rowIndex, 28).Value = Application.WorksheetFunction.CountIf(Range("J2:J" & rowSize), "1")
-        
-        'Cells(2, 10).Value = 0
-        'Application.CalculateFull
-        
         If Val(Application.Version) >= 12 Then
             Range("P1:P" & CStr(formulaCount)).CalculateRowMajorOrder
         Else
@@ -49,8 +45,7 @@ Function reCalculateRunTime(ByVal rowid, ByVal formulaCount)
         If timeTaken < Min Then
           Min = timeTaken
         End If
-          
-        'Cells(2, 10).Value = 1
+
           
     Next J
     
@@ -78,10 +73,7 @@ Function sharedReCalculateRunTime(ByVal rowid, ByVal formulaCount)
     For J = 1 To 10
           
         StartTime = GetTickCount
-        'Cells(rowIndex, 28).Value = Application.WorksheetFunction.CountIf(Range("J2:J" & rowSize), "1")
         
-        'Cells(2, 10).Value = 0
-        'Application.CalculateFull
         
         If Val(Application.Version) >= 12 Then
             Range("P1:P" & CStr(formulaCount)).CalculateRowMajorOrder
@@ -99,10 +91,7 @@ Function sharedReCalculateRunTime(ByVal rowid, ByVal formulaCount)
         End If
         If timeTaken < Min Then
           Min = timeTaken
-        End If
-          
-        'Cells(2, 10).Value = 1
-          
+        End If         
     Next J
     
     totalTime = totalTime - Max - Min
@@ -112,116 +101,46 @@ End Function
 
 Function putFormula(ByVal formulaCount)
     Range("P1:P10000").Clear
-    
-    
     For i = 1 To formulaCount
-
         Worksheets("Sheet1").Range("P" & CStr(i)).Formula = "=SUM($J$2:$J$" & CStr(i + 1) & ")"
-    
     Next i
-
 End Function
 
 Function putFormulaShared(ByVal formulaCount)
     Range("P1:P10000").Clear
-    
     Worksheets("Sheet1").Range("P1").Formula = "=SUM($J$2:$J$2)"
     For i = 2 To formulaCount
-
-        Worksheets("Sheet1").Range("P" & CStr(i)).Formula = "=SUM(P" & CStr(i - 1) & ",J" & CStr(i + 1) & ")"
-    
+        Worksheets("Sheet1").Range("P" & CStr(i)).Formula = "=SUM(P" & CStr(i - 1) & ",J" & CStr(i + 1) & ")"  
     Next i
-
 End Function
 
-Function CalculateRunTime()
-
-    Cells(1, 27).Value = "Instances"
-    Cells(1, 28).Value = "Time (ms)"
-    Cells(1, 29).Value = "Shared Time (ms)"
-    i = 2
-    
-    For J = 10000 To 100001 Step 10000
-        Cells(i, 27).Value = J
-        
-        reCalculateRunTime i, J
-        
-        
-        i = i + 1
-        
-    Next J
-End Function
-
-Sub TestInEff()
-'PURPOSE: Determine how many seconds it took for code to completely run
-    
-'Initialize array of row sizes
-    
-    Dim rowArray As Variant
-    rowArray = Array(150, 6000)
-'Declare row iterator i
-
-    Dim i As Long
-    Dim r As Long
-'Declare end row number counter
-
-    Dim lastRow As Long
-'set headers at the first row. 17,18, and 19 are the coulmn numbers
-
+Function repeatedComputationTime()
     Application.Calculation = xlManual
-
-    'putFormula 100000
-    
-
-'Calculate Run Time for 150 rows
-    
-    CalculateRunTime
-    
-
-End Sub
-
-Function sharedCalculateRunTime()
-
-    i = 2
+    rowIndex = 2
     
     For J = 10000 To 100001 Step 10000
-        
-        
-        sharedReCalculateRunTime i, J
-        
-        
-        i = i + 1
-        
+        putFormula J
+        calculateRepeatedComputationTime i, J
+        rowIndex = rowIndex + 1       
     Next J
 End Function
 
 
-Sub TestEff()
-'PURPOSE: Determine how many seconds it took for code to completely run
-    
-'Initialize array of row sizes
-    
-    Dim rowArray As Variant
-    rowArray = Array(150, 6000)
-'Declare row iterator i
-
-    Dim i As Long
-    Dim r As Long
-'Declare end row number counter
-
-    Dim lastRow As Long
-'set headers at the first row. 17,18, and 19 are the coulmn numbers
-
+Function reusableComputationTime()
     Application.Calculation = xlManual
-
-    'putFormulaShared 100000
+    rowIndex = 2
     
+    For J = 10000 To 100001 Step 10000        
+        putFormulaShared J
+        calculateReusableComputationTime i, J
+        rowIndex = rowIndex + 1
+        
+    Next J
+End Function
 
-'Calculate Run Time for 150 rows
-    
-    sharedCalculateRunTime
-    
-
+Sub main()
+    repeatedComputationTime
+    reusableComputationTime
 End Sub
 
 

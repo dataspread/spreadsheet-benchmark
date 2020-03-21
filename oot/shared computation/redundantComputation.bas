@@ -35,8 +35,8 @@ Sub calculateRunTime(rowIndex As Long, rowSize As Long)
     oSheet1.getCellByPosition(27,0).String = "Single time"
     oSheet1.getCellByPosition(28,0).String = "Multi Time"
     
-  	condition = "1"
-	oActiveRange = UsedRange(oDoc.getCurrentController().getActiveSheet())
+    condition = "1"
+    oActiveRange = UsedRange(oDoc.getCurrentController().getActiveSheet())
     oCellRange = oSheet1.getCellRangeByName("J1:J"+rowSize)
     oArg = Array(oCellRange, condition)
 
@@ -48,70 +48,49 @@ Sub calculateRunTime(rowIndex As Long, rowSize As Long)
         
         MaxOne = -1
         MinOne = 1000000
-        For i = 0 To 4
-   
-	        lTick = GetSystemTicks()
-	 
-	       
-	       	TotalCount = oSvc.callFunction( "COUNTIFS", oArg)
-	        
-	       
-		        
-		    lTick = (GetSystemTicks() - lTick)
+        For i = 0 To 4 
+            lTick = GetSystemTicks()
+            TotalCount = oSvc.callFunction( "COUNTIFS", oArg)
+            lTick = (GetSystemTicks() - lTick)
 		       
-		    totalTime = totalTime + lTick
+            totalTime = totalTime + lTick
 		         
-	         If lTick > Max Then
+            If lTick > Max Then
 	           Max = lTick
-	         End If
-	         If lTick < Min Then
+            End If
+
+            If lTick < Min Then
 	           Min = lTick
-	         End If
-		     if i = 0 then
-		         totalTimeOne = totalTimeOne + lTick
+            End If
+            
+            if i = 0 then
+	        totalTimeOne = totalTimeOne + lTick
 		         
-		         If lTick > MaxOne Then
-		           MaxOne = lTick
-		         End If
-		         If lTick < MinOne Then
-		           MinOne = lTick
-		         End If
-		     End If
-		         
-		   
-	    Next i
-		
-        
-        		
-   
+	        If lTick > MaxOne Then
+		    MaxOne = lTick
+	        End If
+
+	        If lTick < MinOne Then
+		    MinOne = lTick
+	        End If
+            End If  
+	 Next i
     Next j
     
     totalTime = totalTime - Max - Min
-        totalTimeOne = totalTimeOne - MaxOne - MinOne
+    totalTimeOne = totalTimeOne - MaxOne - MinOne
    
     oSheet1.getCellByPosition(26,rowIndex).String = rowSize
     oSheet1.getCellByPosition(27, rowIndex).String = totalTimeOne/8
     oSheet1.getCellByPosition(28, rowIndex).String = totalTime/8
    
-
-
 End Sub
 
-
-
-Sub countif_shared
+Sub main
+    rowIndex = 1 'row id where the current result will be written
    
-   
-    Dim rowArray as Variant
-	
-	j = 1
-	For i = 10000 To 500001 Step 10000
-		calculateRunTime(j, i)
-		j=j+1
-	Next i
-   
-
-
-   
-   
+    For i = 10000 to 500001 Step 10000
+        calculateRunTimeAbsentValueSearch(rowIndex,i)
+        rowIndex = rowIndex + 1   
+    Next i  
 End Sub

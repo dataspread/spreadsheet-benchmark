@@ -3,7 +3,6 @@ REM  *****  BASIC  *****
 Sub putFormula(rowSize As Long, oSheet1 As Object)
 	For i = 1 To rowSize
 		oSheet1.getCellRangeByName("T"&i).Formula = "=COUNTIF(J$2:J$" & 500000 &";1)"
-		'oSheet1.getCellRangeByName("T"&i).Formula = "=SUM(J$2:J$500000)"
 	Next i
 End Sub
 
@@ -29,30 +28,26 @@ Sub calculateRunTime(rowIndex As Long, rowSize As Long)
 	putFormula(rowSize, oSheet1)
 
 	For j = 0 To 9
-		'myDoc.addActionLock()
-		' --- modify your cells here ---
+	    if oSheet1.getCellByPosition(9,1).Value <> 0 Then
+	        oSheet1.getCellByPosition(9,1).Value = 0
+	    Else
+	        oSheet1.getCellByPosition(9,1).Value = 1
+	    Endif
+		
+	    lTick = GetSystemTicks()
 
-		if oSheet1.getCellByPosition(9,1).Value <> 0 Then
-			oSheet1.getCellByPosition(9,1).Value = 0
-		Else
-			oSheet1.getCellByPosition(9,1).Value = 1
-		Endif
-		
-		lTick = GetSystemTicks()
-		
-		'myDoc.removeActionLock()
-		ThisComponent.calculateAll()
+	    ThisComponent.calculateAll()
 	
-		lTick = (GetSystemTicks() - lTick)
+	    lTick = (GetSystemTicks() - lTick)
    	 
-    	totalTime = totalTime + lTick
+	    totalTime = totalTime + lTick
      	 
-     	If lTick > Max Then
-       	Max = lTick
-     	End If
-     	If lTick < Min Then
-       	Min = lTick
-     	End If
+	    If lTick > Max Then
+	        Max = lTick
+	    End If
+	    If lTick < Min Then
+	        Min = lTick
+	    End If
 	Next j
 	
 	totalTime = totalTime - Max - Min
@@ -64,9 +59,9 @@ Sub Main
 	
 	ThisComponent.isAutomaticCalculationEnabled = False
 	calculateRunTime(1,1)
-	j = 2
+	rowIndex = 2
 	For i = 100 To 1001 Step 100
-		calculateRunTime(j, i)
-		j=j+1
+            calculateRunTime(rowIndex, i)
+            rowIndex=rowIndex+1
 	Next i
 End Sub

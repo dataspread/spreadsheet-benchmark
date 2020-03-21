@@ -7,7 +7,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
-Sub calculateRunTime(ByVal rowIndex, ByVal rowCount)
+
+Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
     
 'Initialize Timer Variables
     Dim StartTime As Double
@@ -23,30 +24,22 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowCount)
     Dim StartPvt As String
     Dim SrcData As String
     
-    Dim pf As String
-    Dim pf_Name As String
-    
-    rowSize = rowCount * 1000
  'Remember time when macro starts
     Max = -1
     Min = 1000000
     totalTime = 0
     
-    directory = "C:\Users\rzhang74\Desktop\Research2018Fall\Spring2020\open\"
-    Name = "airbnb_" & CStr(rowCount) & "k.xlsx"
-    sheetName = "airbnb_" & CStr(rowCount) & "k"
-    Filename = Dir(directory & Name)
+    'RELATIVE_PATH ---> assign directory path here
+    'FILE_PREFIX ---> assuming all the files in the directory have a common prefix followed by its number of rows
     
-    Sheets("Sheet1").Delete
-    Dim sheetNew As Worksheet
-    Set sheetNew = Sheets.Add
-    sheetNew.Name = "Sheet1"
-
+    Name = FILE_PREFIX & CStr(rowSize) & ".xlsx"
+    FILE_PATH = Dir(RELATIVE_PATH & Name)
+    sheetName = "Sheet1"
     
-    Workbooks.Open (directory & Filename)
+    Workbooks.Open (FILE_PATH)
         
-    Workbooks(Filename).Worksheets(sheetName).Range("A1:O" & CStr(rowSize + 1)).Copy
-        
+    Workbooks(FILE_PATH).Worksheets(sheetName).Range("A1:O" & CStr(rowSize + 1)).Copy
+    
     'Activate the destination worksheet
     Sheets("Sheet1").Activate
     'Select the target range
@@ -55,7 +48,7 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowCount)
     ActiveSheet.Paste
     
     Application.CutCopyMode = False
-    Workbooks(Filename).Close
+    Workbooks(FILE_PATH).Close
     
     totalTimeS = 0
     totalTimeR = 0
@@ -109,7 +102,8 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowCount)
     Sheets("import").Cells(rowIndex, 2).Value = totalTimeS / 8
     Sheets("import").Cells(rowIndex, 3).Value = totalTimeR / 8
 End Sub
-Sub calculateRunTimeNE(ByVal rowIndex, ByVal rowCount)
+
+Sub calculateRunTimeAbsentValueSearch(ByVal rowIndex, ByVal rowSize)
     
 'Initialize Timer Variables
     Dim StartTime As Double
@@ -125,30 +119,23 @@ Sub calculateRunTimeNE(ByVal rowIndex, ByVal rowCount)
     Dim StartPvt As String
     Dim SrcData As String
     
-    Dim pf As String
-    Dim pf_Name As String
     
-    rowSize = rowCount * 1000
  'Remember time when macro starts
     Max = -1
     Min = 1000000
     totalTime = 0
     
-    directory = "C:\Users\rzhang74\Desktop\Research2018Fall\Spring2020\open\"
-    Name = "airbnb_" & CStr(rowCount) & "k.xlsx"
-    sheetName = "airbnb_" & CStr(rowCount) & "k"
-    Filename = Dir(directory & Name)
+    'RELATIVE_PATH ---> assign directory path here
+    'FILE_PREFIX ---> assuming all the files in the directory have a common prefix followed by its number of rows
     
-    Sheets("Sheet1").Delete
-    Dim sheetNew As Worksheet
-    Set sheetNew = Sheets.Add
-    sheetNew.Name = "Sheet1"
-
+    Name = FILE_PREFIX & CStr(rowSize) & ".xlsx"
+    FILE_PATH = Dir(RELATIVE_PATH & Name)
+    sheetName = "Sheet1"
     
-    Workbooks.Open (directory & Filename)
+    Workbooks.Open (FILE_PATH)
         
-    Workbooks(Filename).Worksheets(sheetName).Range("A1:O" & CStr(rowSize + 1)).Copy
-        
+    Workbooks(FILE_PATH).Worksheets(sheetName).Range("A1:O" & CStr(rowSize + 1)).Copy
+    
     'Activate the destination worksheet
     Sheets("Sheet1").Activate
     'Select the target range
@@ -157,7 +144,7 @@ Sub calculateRunTimeNE(ByVal rowIndex, ByVal rowCount)
     ActiveSheet.Paste
     
     Application.CutCopyMode = False
-    Workbooks(Filename).Close
+    Workbooks(FILE_PATH).Close
     
     totalTimeS = 0
     totalTimeR = 0
@@ -181,43 +168,33 @@ Sub calculateRunTimeNE(ByVal rowIndex, ByVal rowCount)
         If SecondsElapsed < MinS Then
           MinS = SecondsElapsed
         End If
-        
-        
-                    
-          
     Next j
     
     totalTimeS = totalTimeS - MaxS - MinS
     Sheets("import").Activate
-   
     Sheets("import").Cells(rowIndex, 4).Value = totalTimeS / 8
 End Sub
 
-Sub Test1()
-'PURPOSE: Determine how many seconds it took for code to completely run
-    
-'Initialize array of row sizes
-    
-   
-
-    Dim i As Long
-
-'set headers at the first row. 17,18, and 19 are the coulmn numbers
+Sub main()
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
+
+    'add headers to the current /xlsm file where results will be written
     Sheets("import").Cells(1, 1).Value = "Rows Imported"
     Sheets("import").Cells(1, 2).Value = "Time (s)"
-    Sheets("import").Cells(1, 3).Value = "Reverse Time (s)"
-    Sheets("import").Cells(1, 4).Value = "No exist Time (s)"
-    
-    i = 2
-    For j = 10 To 501 Step 10
-        'calculateRunTime i, j
-        calculateRunTimeNE i, j
-        i = i + 1
-          
-    Next j
-    
+
+    rowIndex = 2
+    For i = 10000 to 500001 Step 10000
+        calculateRunTime rowIndex, i
+        rowIndex = rowIndex + 1 
+    Next i
+
+    rowIndex = 2
+    For i = 10000 to 500001 Step 10000
+        calculateRunTimeAbsentValueSearch rowIndex, i
+        rowIndex = rowIndex + 1 
+    Next i
+
     Application.ScreenUpdating = True
 End Sub
 

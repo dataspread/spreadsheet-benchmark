@@ -19,14 +19,17 @@ Private Function GetMemUsage(ByVal rowIndex, ByVal rowSize)
   Dim memUsage As Long
   Dim minUsage As Long
   Dim maxUsage As Long
-  directory = "C:\Users\rzhang74\Desktop\Research2018Fall\Spring2020\memory\"
-  Name = "airbnb_" & CStr(rowSize) & ".xlsx"
-  Filename = Dir(directory & Name)
+  'RELATIVE_PATH ---> assign directory path here
+    'FILE_PREFIX ---> assuming all the files in the directory have a common prefix followed by its number of rows
+    
+  Name = FILE_PREFIX & CStr(rowSize) & ".xlsx"
+  FILE_PATH = Dir(RELATIVE_PATH & Name)
+  Workbooks.Open (FILE_PATH)
     
   minUsage = 10000000
   maxUsage = -1
   For i = 1 To 10
-    Workbooks.Open (directory & Filename)
+    Workbooks.Open (FILE_PATH)
           
     Set objSWbemServices = GetObject("winmgmts:")
     
@@ -37,7 +40,7 @@ Private Function GetMemUsage(ByVal rowIndex, ByVal rowSize)
     memUsage = memUsage + tmpMemUsage
     Set objSWbemServices = Nothing
     
-    Workbooks(Filename).Close
+    Workbooks(FILE_PATH).Close
     
     If tmpMemUsage < minUsage Then
         minUsage = tmpMemUsage
@@ -45,7 +48,6 @@ Private Function GetMemUsage(ByVal rowIndex, ByVal rowSize)
     If tmpMemUsage > maxUsage Then
         maxUsage = tmpMemUsage
     End If
-    'Sheets("import").Cells(rowIndex, i + 2).Value = tmpMemUsage
   Next i
   
   Sheets("import").Cells(rowIndex, 1).Value = rowSize
@@ -64,14 +66,17 @@ Private Function GetMemUsageFormula(ByVal rowIndex, ByVal rowSize)
   Dim memUsage As Long
   Dim minUsage As Long
   Dim maxUsage As Long
-  directory = "C:\Users\rzhang74\Desktop\Research2018Fall\Spring2020\memory\formula\"
-  Name = "weather" & CStr(rowSize) & ".xlsx"
-  Filename = Dir(directory & Name)
+  'RELATIVE_PATH ---> assign directory path here
+    'FILE_PREFIX ---> assuming all the files in the directory have a common prefix followed by its number of rows
+    
+  Name = FILE_PREFIX & CStr(rowSize) & ".xlsx"
+  FILE_PATH = Dir(RELATIVE_PATH & Name)
+  Workbooks.Open (FILE_PATH)
     
   minUsage = 10000000
   maxUsage = -1
   For i = 1 To 10
-    Workbooks.Open (directory & Filename)
+    Workbooks.Open (FILE_PATH)
           
     Set objSWbemServices = GetObject("winmgmts:")
     
@@ -82,7 +87,7 @@ Private Function GetMemUsageFormula(ByVal rowIndex, ByVal rowSize)
     memUsage = memUsage + tmpMemUsage
     Set objSWbemServices = Nothing
     
-    Workbooks(Filename).Close
+    Workbooks(FILE_PATH).Close
     
     If tmpMemUsage < minUsage Then
         minUsage = tmpMemUsage
@@ -90,99 +95,13 @@ Private Function GetMemUsageFormula(ByVal rowIndex, ByVal rowSize)
     If tmpMemUsage > maxUsage Then
         maxUsage = tmpMemUsage
     End If
-    'Sheets("import").Cells(rowIndex, i + 2).Value = tmpMemUsage
   Next i
-  
-  'Sheets("import").Cells(rowIndex, 1).Value = rowSize
     
   Sheets("import").Cells(rowIndex, 3).Value = (memUsage - maxUsage - minUsage) / 1024 / 8
   
 End Function
 
-Private Function GetMemUsagePivot(ByVal rowIndex, ByVal rowSize)
-  
-  ' Returns the current Excel.Application
-  ' memory usage in MB
-  Dim directory As String
-  Dim Name As String
-  Dim tmpMemUsage As Long
-  Dim memUsage As Long
-  Dim minUsage As Long
-  Dim maxUsage As Long
-  directory = "C:\Users\rzhang74\Desktop\Research2018Fall\Spring2020\memory\pivot\"
-  Name = "weather" & CStr(rowSize) & ".xlsx"
-  Filename = Dir(directory & Name)
-    
-  minUsage = 10000000
-  maxUsage = -1
-  For i = 1 To 10
-    Workbooks.Open (directory & Filename)
-          
-    Set objSWbemServices = GetObject("winmgmts:")
-    
-    tmpMemUsage = objSWbemServices.Get( _
-      "Win32_Process.Handle='" & _
-      GetCurrentProcessId & "'").WorkingSetSize / 1024
-      
-    memUsage = memUsage + tmpMemUsage
-    Set objSWbemServices = Nothing
-    
-    Workbooks(Filename).Close
-    
-    If tmpMemUsage < minUsage Then
-        minUsage = tmpMemUsage
-    End If
-    If tmpMemUsage > maxUsage Then
-        maxUsage = tmpMemUsage
-    End If
-    'Sheets("import").Cells(rowIndex, i + 2).Value = tmpMemUsage
-  Next i
-  
-  'Sheets("import").Cells(rowIndex, 1).Value = rowSize
-    
-  Sheets("import").Cells(rowIndex, 4).Value = (memUsage - maxUsage - minUsage) / 1024 / 8
-  
-End Function
-
-Private Function GetMemUsageExcel(ByVal rowIndex, ByVal rowSize)
-  
-  ' Returns the current Excel.Application
-  ' memory usage in MB
-  Dim directory As String
-  Dim Name As String
-  Dim tmpMemUsage As Long
-  Dim memUsage As Long
-  Dim minUsage As Long
-  Dim maxUsage As Long
-  
-  minUsage = 10000000
-  maxUsage = -1
-  For i = 1 To 10
-    Set objSWbemServices = GetObject("winmgmts:")
-    
-    tmpMemUsage = objSWbemServices.Get( _
-      "Win32_Process.Handle='" & _
-      GetCurrentProcessId & "'").WorkingSetSize / 1024
-      
-    memUsage = memUsage + tmpMemUsage
-    Set objSWbemServices = Nothing
-    
-    If tmpMemUsage < minUsage Then
-        minUsage = tmpMemUsage
-    End If
-    If tmpMemUsage > maxUsage Then
-        maxUsage = tmpMemUsage
-    End If
-    'Sheets("import").Cells(rowIndex, i + 2).Value = tmpMemUsage
-  Next i
-  
-  'Sheets("import").Cells(rowIndex, 1).Value = rowSize
-    
-  Sheets("import").Cells(rowIndex, 5).Value = (memUsage - maxUsage - minUsage) / 1024 / 8
-  
-End Function
-
-Sub Test1()
+Sub main()
 
 'Declare row iterator i
 
@@ -196,18 +115,18 @@ Sub Test1()
     Sheets("import").Cells(1, 3).Value = "Formula Size (MB)"
     Sheets("import").Cells(1, 4).Value = "Pivot Size (MB)"
     
-    i = 2
+    rowIndex = 2
     For j = 100000 To 500001 Step 100000
-        GetMemUsage i, j
-        
-        'GetMemUsageFormula i, j
-        
-        'GetMemUsagePivot i, j
-        i = i + 1
-          
+        GetMemUsage rowIndex, j
+        rowIndex = rowIndex + 1
     Next j
     
-    'GetMemUsageExcel 2, 0
+    rowIndex = 2
+    For j = 100000 To 500001 Step 100000
+        GetMemUsageFormula rowIndex, j
+        rowIndex = rowIndex + 1
+    Next j
+
     Application.ScreenUpdating = True
 End Sub
 

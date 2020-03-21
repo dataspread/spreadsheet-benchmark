@@ -35,32 +35,28 @@ Sub calculateRunTime(rowIndex As Long, rowSize As Long)
 	putFormula(rowSize, oSheet1)
 
 	For j = 0 To 9
-		'myDoc.addActionLock()
-		' --- modify your cells here ---
+	    if oSheet1.getCellByPosition(9,1).Value <> 0 Then
+	        oSheet1.getCellByPosition(9,1).Value = 0
+	    Else
+	        oSheet1.getCellByPosition(9,1).Value = 1
+	    Endif
+		
+	    lTick = GetSystemTicks()
 
-		if oSheet1.getCellByPosition(9,1).Value <> 0 Then
-			oSheet1.getCellByPosition(9,1).Value = 0
-		Else
-			oSheet1.getCellByPosition(9,1).Value = 1
-		Endif
-		
-		lTick = GetSystemTicks()
-		
-		'myDoc.removeActionLock()
-		ThisComponent.calculateAll()
+	    ThisComponent.calculateAll()
 	
-		lTick = (GetSystemTicks() - lTick)
+	    lTick = (GetSystemTicks() - lTick)
 		
 		
    	 
-    	totalTime = totalTime + lTick
+	    totalTime = totalTime + lTick
      	 
-     	If lTick > Max Then
-       	Max = lTick
-     	End If
-     	If lTick < Min Then
-       	Min = lTick
-     	End If
+	    If lTick > Max Then
+	        Max = lTick
+	    End If
+	    If lTick < Min Then
+	        Min = lTick
+	    End If
 	Next j
 	totalTime = totalTime - Max - Min
 	oSheet1.getCellByPosition(27,rowIndex).String = totalTime/8
@@ -68,12 +64,11 @@ Sub calculateRunTime(rowIndex As Long, rowSize As Long)
 End Sub
 
 Sub Main
-	
-	ThisComponent.isAutomaticCalculationEnabled = False
-	j=1
-	For i = 10000 To 10001 Step 10000
-		calculateRunTime(j, i)
-		j=j+1
-	Next i
+    ThisComponent.isAutomaticCalculationEnabled = False
+    rowIndex=1
+    For i = 10000 To 10001 Step 10000
+        calculateRunTime(rowIndex, i)
+        j=j+1
+    Next i
 	
 End Sub

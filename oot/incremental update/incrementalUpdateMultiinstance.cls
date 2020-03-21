@@ -54,110 +54,28 @@ Function reCalculateRunTime(ByVal rowid)
     
 End Function
 
-Function fullCalculateRunTime(ByVal rowid)
-    
-'Initialize Timer Variables (milliseconds version, more error prone I believe)
-    Dim StartTime As Double
-    Dim SecondsElapsed As Double
-    
-    
- 'Remember time when macro starts
-    Max = -1
-    Min = 1000000
-    totalTime = 0
-    
-    MaxU = -1
-    MinU = 1000000
-    totalTimeU = 0
-        
-    For J = 1 To 10
-          
-        StartTime = GetTickCount
-        Cells(2, 10).Value = 0
-        Cells(rowIndex, 28).Value = Application.WorksheetFunction.CountIf(Range("J2:J" & rowSize), "1")
-        
-        
-        
-    'Determine how many seconds code took to run
-        SecondsElapsed = Round(GetTickCount - StartTime, 2)
-        
-        timeTaken = SecondsElapsed
-        totalTime = totalTime + timeTaken
-          
-        If timeTaken > Max Then
-          Max = timeTaken
-        End If
-        If timeTaken < Min Then
-          Min = timeTaken
-        End If
-          
-        Cells(2, 10).Value = 1
-          
-    Next J
-    
-    totalTime = totalTime - Max - Min
-    Cells(rowid, 29).Value = totalTime / 8
-    
-End Function
-
 Function putFormula(ByVal formulaCount)
     Range("P1:P10000").Clear
     For i = 1 To formulaCount
-
         Worksheets("Sheet1").Range("P" & CStr(i)).Formula = "=COUNTIF($J$2:$J$500001,""1"")"
-    
     Next i
 
 End Function
-Sub Test1()
-'PURPOSE: Determine how many seconds it took for code to completely run
-    
-'Initialize array of row sizes
-    
-    Dim rowArray As Variant
-    rowArray = Array(150, 6000)
-'Declare row iterator i
 
-    Dim i As Long
-    Dim r As Long
-'Declare end row number counter
+Sub main()
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
 
-    Dim lastRow As Long
-'set headers at the first row. 17,18, and 19 are the coulmn numbers
+    'add headers to the current /xlsm file where results will be written
+    Sheets("import").Cells(1, 1).Value = "Rows Imported"
+    Sheets("import").Cells(1, 2).Value = "Time (s)"
 
-    Application.Calculation = xlManual
-
-    Cells(1, 27).Value = "Instances"
-    Cells(1, 28).Value = "Recalc Time (ms)"
-    Cells(1, 29).Value = "Full Calc Time (ms)"
-
-'Calculate Run Time for 150 rows
-    i = 2
-    putFormula 1
-    Cells(i, 27).Value = 1
-    reCalculateRunTime i
-    'fullCalculateRunTime i
-    i = i + 1
-
-    For J = 100 To 1001 Step 100
-        Cells(i, 27).Value = J
+    rowIndex = 2
+    For J = 10000 To 500001 Step 10000
         putFormula J
-        reCalculateRunTime i
-        'fullCalculateRunTime i
-        i = i + 1
-        'fullCalculateRunTime
+        reCalculateRunTime rowIndex
+        rowIndex = rowIndex + 1
     Next J
-'last row number of sheet
-    lastRow = Range("A" & Rows.Count).End(xlUp).Row
-'Foor loop
-    'For i = 0 To 1
-     '   calculateRunTime i + 2, rowArray(i)
-          
-    'Next i
-    
-    
-    
-
 End Sub
 
 
