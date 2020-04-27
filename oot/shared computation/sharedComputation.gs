@@ -1,22 +1,23 @@
+// TODO: REPLACE ALL PARAMETERS WITH VALUES SPECIFIC TO EXPERIMENT
 /* ============= START OF PARAMETERS ============= */
 
-// url to the spreadsheet to write the results
+// url of the spreadsheet to write the results
 var RESULTS_URL = "results_url"; // e.g. "https://docs.google.com/spreadsheets/d/ABCXYZ/edit" 
-// spreadsheet sizes to run experiment on
-// script may time out if sizes is too large, so sizes should be subset of urls
-var sizes = [size1, size2, ...]; // e.g. [10000, 20000]
 // mapping from spreadsheet row counts to url of spreadsheet
 var urls = {
   size1: "url1", // e.g. 10000: "https://docs.google.com/spreadsheets/d/ABCXYZ/edit"
   size2: "url2",
   // ...
 };
-// name of experiment to be written to results sheet
-var EXPER_NAME = "sort tests"
-// sheet name of results spreadsheet to be written to
-var SHEET_NAME = "method 1"
 
-// TODO: Change values in sort function
+// name of experiment to be written to results sheet
+var EXPER_NAME = "shared computation tests";
+// sheet name of results spreadsheet to be written to
+var SHEET_NAME = "method 1";
+// whether experiment repeats computation or reuse intermediate results
+var IS_REPEATED = true;
+
+// TODO: Change values in `repeated` and `reusable` functions
 
 /* ============= END OF PARAMETERS ============= */
 
@@ -27,7 +28,12 @@ function loop() {
   var tenruns = []; // to average across 10 trials
   for (j = 0; j < 10; j++) {
     for (i = 0; i < sizes.length; i++) {
-      var ret = sort(sizes[i], urls[sizes[i]]);
+      var size = sizes[i];
+      if (IS_REPEATED) {
+        var ret = repeated(size, urls[size]);
+      } else {
+        var ret = reusable(size, urls[size]);
+      }
       results.push(ret);
     }
     tenruns.push(results);
@@ -99,28 +105,76 @@ function writeInter(sheet, results) {
   }
 }
 
-/*  Measures time to sort `size` rows of the spreadsheet specified by `url`. */
-function sort(size, url) {
-  var sheet = SpreadsheetApp.openByUrl(url).getActiveSheet();
-
-  // add a column with numbers 1-size so that we can undo the sort
-  sheet.insertColumns(18);
-  var vals = [];
-  for (z = 0; z <= size; z++) {
-    vals.push([i]);
+/*  Measures time to compute sum using intermediate results on spreadsheet of 
+    size `size` specified by `url`.
+    Experiment is performed on copy of the spreadsheet. */
+function reusable(size, url) {
+  var ss = SpreadsheetApp.openByUrl(url);
+  var sheet = ss.getActiveSheet();
+  // insert two columns at the beginning
+  sheet.insertColumnBefore(1);
+  sheet.insertColumnBefore(1);
+  // insert formulas that use previous cell's result
+  var data = sheet.getRange(1, 1, size, 2).getValues();
+  data[0][0] = "1";
+  data[0][1] = "=A1";
+  for (z = 1; z < size; z++) {
+    data[z][0] = z + 1;
+    data[z][1] = "=B" + z + "+A" + (z + 1);
   }
-  sheet.getRange(1, 18, size + 1, 1).setValues(vals);
+  sheet.getRange(1, 1, size, 2).setValues(data);
 
-  // now do the sort
-  var range = sheet.getRange("A1:R" + (size + 1));
-  var startDate = new Date();
-  range.sort({ column: 1, ascending: false });
-  var x = sheet.getRange(5, 2).getValue();
+  var oldVal = sheet.getRange(1, 1).getValue();
+  console.log(oldVal);
+
+  var date = new Date();
+  // update inital value and get the final result
+  sheet.getRange(1, 1).setValue(oldVal + 1);
+  var count = sheet.getRange(size, 2).getValue();
   var endDate = new Date();
 
-  // clean up
-  range.sort({ column: 18, ascending: true });
-  sheet.deleteColumn(18);
-  var ret = endDate.getTime() - startDate.getTime();
+  console.log("count is " + count);
+  // clean up and delete first two columns
+  sheet.deleteColumn(1);
+  sheet.deleteColumn(1);
+
+  ret = endDate.getTime() - date.getTime();
+  return ret;
+}
+
+/*  Measures time to compute sum without using intermediate results on spreadsheet of 
+    size `size` specified by `url`.
+    Experiment is performed on copy of the spreadsheet. */
+function repeated(size, url) {
+  var ss = SpreadsheetApp.openByUrl(url);
+  var sheet = ss.getActiveSheet();
+  // insert two columns at the beginning
+  sheet.insertColumnBefore(1);
+  sheet.insertColumnBefore(1);
+  // insert formulas that calculate from scratch
+  var data = sheet.getRange(1, 1, size, 2).getValues();
+  data[0][0] = "1";
+  data[0][1] = "=A1";
+  for (z = 1; z < size; z++) {
+    data[z][0] = z + 1;
+    data[z][1] = "=SUM(A1:A" + (z + 1) + ")";
+  }
+  sheet.getRange(1, 1, size, 2).setValues(data);
+
+  var oldVal = sheet.getRange(1, 1).getValue();
+  console.log(oldVal);
+
+  var date = new Date();
+  // update inital value and get the final result
+  sheet.getRange(1, 1).setValue(oldVal + 1);
+  var count = sheet.getRange(size, 2).getValue();
+  var endDate = new Date();
+
+  console.log("count is " + count);
+  // clean up and delete first two columns
+  sheet.deleteColumn(1);
+  sheet.deleteColumn(1);
+
+  ret = endDate.getTime() - date.getTime();
   return ret;
 }

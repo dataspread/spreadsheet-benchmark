@@ -1,39 +1,40 @@
+// TODO: REPLACE ALL PARAMETERS WITH VALUES SPECIFIC TO EXPERIMENT
 /* ============= START OF PARAMETERS ============= */
 
-// url to the spreadsheet to write the results
+// url of the spreadsheet to write the results
 var RESULTS_URL = "results_url"; // e.g. "https://docs.google.com/spreadsheets/d/ABCXYZ/edit" 
-// spreadsheet sizes to run experiment on
-// script may time out if sizes is too large, so sizes should be subset of urls
-var sizes = [size1, size2, ...]; // e.g. [10000, 20000]
-// mapping from spreadsheet row counts to url of spreadsheet
-var urls = {
-  size1: "url1", // e.g. 10000: "https://docs.google.com/spreadsheets/d/ABCXYZ/edit"
-  size2: "url2",
-  // ...
-};
-// name of experiment to be written to results sheet
-var EXPER_NAME = "sort tests"
-// sheet name of results spreadsheet to be written to
-var SHEET_NAME = "method 1"
+// spreadsheet url of data. since number of instances will be varied, spreadsheet size stays constant
+var url = "url" // e.g. "https://docs.google.com/spreadsheets/d/ABCXYZ/edit";
+// number of rows in the spreadsheet specified by url
+var SIZE = 0; // e.g. 90000
+// each number represents how many instances of the formula to run with the experiment
+// script may time out if array is too large
+var num_instances = [inst1, inst2, ...]; // e.g. [5, 100]
 
-// TODO: Change values in sort function
+// name of experiment to be written to results sheet
+var EXPER_NAME = "incremental update multi instance tests";
+// sheet name of results spreadsheet to be written to
+var SHEET_NAME = "method 1";
+
+// TODO: Change values in `sum` function
 
 /* ============= END OF PARAMETERS ============= */
 
-/*  Runs experiments on all spreadsheets specified by `sizes` array.
-    This is the main function to be called for running the experiment. */
+/*  Runs the experiment on spreadsheet of size `size` with `num_instances` of formulas.
+    This is the main function to be called for running a trial of the experiment. */
 function loop() {
-  var results = [];
-  var tenruns = []; // to average across 10 trials
+  var results1 = []; // for inital fandr
+  var tenruns1 = []; // to average across 10 trials
   for (j = 0; j < 10; j++) {
-    for (i = 0; i < sizes.length; i++) {
-      var ret = sort(sizes[i], urls[sizes[i]]);
-      results.push(ret);
+    for (i = 0; i < num_instances.length; i++) {
+      var ret1 = sum(SIZE, url, num_instances[i]);
+      results1.push(ret1);
     }
-    tenruns.push(results);
-    results = [];
+    console.log(results1);
+    tenruns1.push(results1);
+    results1 = [];
   }
-  averageStats(tenruns);
+  averageStats(tenruns1);
 }
 
 /*  Takes in an array of trial times for all spreadsheet sizes and writes
@@ -81,7 +82,7 @@ function writeToSheet(sheet, results) {
   lastRow++;
   // write all sizes to sheet
   for (i = 0; i < results.length; i++) {
-    sheet.getRange(lastRow, i + 1).setValue(sizes[i]);
+    sheet.getRange(lastRow, i + 1).setValue(num_instances[i]);
   }
   lastRow++;
   // write all average times to sheet
@@ -99,28 +100,31 @@ function writeInter(sheet, results) {
   }
 }
 
-/*  Measures time to sort `size` rows of the spreadsheet specified by `url`. */
-function sort(size, url) {
-  var sheet = SpreadsheetApp.openByUrl(url).getActiveSheet();
-
-  // add a column with numbers 1-size so that we can undo the sort
-  sheet.insertColumns(18);
-  var vals = [];
-  for (z = 0; z <= size; z++) {
-    vals.push([i]);
+/*  Measures time to compute `inst` formulas on spreadsheet of `size` rows with url `url`. */
+function sum(size, url, inst) {
+  ret = [];
+  var ss = SpreadsheetApp.openByUrl(url);
+  var sheet = ss.getActiveSheet();
+  var oldval = sheet.getRange(2, 10).getValue();
+  var form_string = "=COUNTIF(J2:J" + size + ", 1)";
+  var value_to_set = oldval == 1 ? 0 : 1;
+  sheet.insertColumnBefore(18);
+  var data = sheet.getRange(1, 18, inst, 18).getValues();
+  for (z = 0; z < inst; z++) {    // insert form_string inst times
+    data[z][1] = form_string;
   }
-  sheet.getRange(1, 18, size + 1, 1).setValues(vals);
+  sheet.getRange(1, 18, inst, 18).setValues(data);   // set them all at once
+  var res = sheet.getRange(1, 18, inst, 18).getValues();   // get them all again to force computation
 
-  // now do the sort
-  var range = sheet.getRange("A1:R" + (size + 1));
   var startDate = new Date();
-  range.sort({ column: 1, ascending: false });
-  var x = sheet.getRange(5, 2).getValue();
+  sheet.getRange(2, 10).setValue(value_to_set); // change 1 value
+  var res = sheet.getRange(1, 18, inst, 18).getValues();   // get them all again to force recomputation
   var endDate = new Date();
 
+  sheet.getRange(2, 10).setValue(oldval);
   // clean up
-  range.sort({ column: 18, ascending: true });
   sheet.deleteColumn(18);
-  var ret = endDate.getTime() - startDate.getTime();
+
+  ret = endDate.getTime() - startDate.getTime();
   return ret;
 }

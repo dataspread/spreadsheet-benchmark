@@ -49,7 +49,7 @@ function setFilter(url) {
   var ss = ss.copy(ss.getName() + "_" + Date.now());
   var sheet = ss.getActiveSheet();
   var filterSettings = {};
-  var sheetId = ss.getActiveSheet().getSheetId();
+  var sheetId = sheet.getSheetId();
   // The range of data on which you want to apply the filter.
   // optional arguments: startRowIndex, startColumnIndex, endRowIndex, endColumnIndex
   filterSettings.range = { // replace

@@ -56,7 +56,8 @@ function countif(size, url) {
   // copy is added to "Recent", not to location of original spreadsheet
   var ss = ss.copy(ss.getName() + "_" + Date.now());
   var sheet = ss.getActiveSheet();
-  var oldval = sheet.getRange(1, 6).getValue(); // replace
+  var oldval = sheet.getRange(2, 10).getValue(); // replace
+  var oldval2 = sheet.getRange(4, 18).getValue();
   // do initial count
   var date = new Date();
   sheet.getRange(4, 18).setFormula("=COUNTIF(J2:J" + size + ", 1)"); // replace
@@ -66,13 +67,15 @@ function countif(size, url) {
 
   // now change one value to trigger recomputation
   var secondDate = new Date();
-  sheet.getRange(1, 6).setValue(2016); // replace
+  sheet.getRange(2, 10).setValue(2016); // replace
   var secondCount = sheet.getRange(4, 18).getValue(); // replace
   var secondEndDate = new Date();
   ret.push(secondEndDate.getTime() - secondDate.getTime());
 
   // clean up
-  sheet.getRange(1, 6).setValue(oldval); // replace
+  sheet.getRange(2, 10).setValue(oldval); // replace
+  sheet.getRange(4, 18).setValue(oldval2);
+
   console.log("first count is " + firstCount);
   console.log("second count is " + secondCount);
   return ret;

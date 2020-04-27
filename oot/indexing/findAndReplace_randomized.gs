@@ -25,9 +25,9 @@ var SHEET_NAME = "method 1";
 function experiment(size) {
   var results_sheet = SpreadsheetApp.openByUrl(RESULTS_URL).getSheetByName(SHEET_NAME);
   if (IS_PRESENT) {
+    // `replace` string should not be in the search column
     var result = fandr(size, urls[size], "present", "replace"); // replace `present` with string in search column
   } else {
-    // 
     var result = fandr(size, urls[size], "absent", "replace"); // replace `absent` with string not in search column
   }
   writeToSheet(results_sheet, size, result);
@@ -50,7 +50,6 @@ function writeToSheet(sheet, size, results) {
 /*  Measures time to do find and replace on the spreadsheet of size `size` specified by `url`.
     Experiment is performed on copy of the spreadsheet. */
 function fandr(size, url, find, repl) {
-  console.log("Starting " + size);
   var ss = SpreadsheetApp.openByUrl(url);
   // perform experiment on copy of spreadsheet
   // copy is added to "Recent", not to location of original spreadsheet
@@ -71,7 +70,15 @@ function fandr(size, url, find, repl) {
   sheet.getRange(1, 4, rws, 3).setValues(data); // replace
   var endDate = new Date();
 
-  console.log("Ending " + size);
+  // clean up
+  for (i = 0; i < rws; i++) {
+    try {
+      data[i][1] = data[i][1].replace(repl, find);
+    }
+    catch (err) { continue; }
+  }
+  sheet.getRange(1, 4, rws, 3).setValues(data); // replace
+
   ret = endDate.getTime() - startDate.getTime();
   return ret;
 }

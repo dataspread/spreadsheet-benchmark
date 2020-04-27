@@ -53,11 +53,14 @@ function countif(size, url) {
   // TODO: Change countif formula and row, column to put count
   var row = 0; // replace
   var col = 0; // replace
+  var oldval = sheet.getRange(row, col).getValue();
   sheet.getRange(row, col).setFormula("=COUNTIF(A1:A" + size + ", 1)"); // replace
   // get value to ensure countif is complete
   var count = sheet.getRange(row, col).getValue();
   var endDate = new Date();
 
+  // cleanup
+  var oldval = sheet.getRange(row, col).setValue(oldval);
   console.log("count is " + count);
   ret = endDate.getTime() - startDate.getTime();
   return ret;

@@ -34,8 +34,8 @@ function writeToSheet(sheet, size, result) {
   var lastRow = sheet.getLastRow() + 1;
   sheet.getRange(lastRow, 1).setValue(Utilities.formatDate(time, 'America/Chicago', 'MMMM dd, yyyy HH:mm:ss Z'));
   lastRow++;
-  sheet.getRange(lastRow, 1).setValue(EXPER_NAME + "(single formula");
-  sheet.getRange(lastRow, 2).setValue(EXPER_NAME + "(multi formula");
+  sheet.getRange(lastRow, 1).setValue(EXPER_NAME + "(single formula)");
+  sheet.getRange(lastRow, 2).setValue(EXPER_NAME + "(multi formula)");
   lastRow++;
   sheet.getRange(lastRow, 1).setValue(size);
   lastRow++;
@@ -45,7 +45,8 @@ function writeToSheet(sheet, size, result) {
 
 /*  Measures time to compute a formula one vs multiple times on spreadsheet of 
     size `size` specified by `url`.
-    Experiment is performed on copy of the spreadsheet. */
+    Experiment is performed on copy of the spreadsheet. 
+    The implementation of this experiment differs from the original. */
 function insertFormula(size, url) {
   var ss = SpreadsheetApp.openByUrl(url);
   // perform experiment on copy of spreadsheet
@@ -56,18 +57,14 @@ function insertFormula(size, url) {
   var warm_start = "=COUNTIF(A1:Q" + size + ", 2017)";
   var form_string = "=COUNTIF(A1:Q" + size + ", 2016)";
   // set an independent formula to reduce inital overhead of using a new spreedsheet
-  var data = sheet.getRange(1, 18).getValues();
-  data[0][0] = warm_start
-  sheet.getRange(1, 18).setValues(data);
+  sheet.getRange(1, 18).setFormula(warm_start);
   var data = sheet.getRange(1, 18).getValues();
   // multi instances
   var start_date = new Date();
   // set formula to subsequent rows and calculate time
   for (i = 0; i < 5; i++) {
     var row = i + 2; // i+2 because after warm start and sheets are 1-indexed
-    var data = sheet.getRange(row, 18).getValues();
-    data[0][0] = form_string
-    sheet.getRange(row, 18).setValues(data);
+    sheet.getRange(row, 18).setFormula(form_string);
     var data = sheet.getRange(row, 18).getValues();
     // calculate time for first  of 5 formula
     if (i == 0) {

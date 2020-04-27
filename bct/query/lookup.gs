@@ -11,12 +11,15 @@ var urls = {
   size2: "url2",
   // ...
 };
+
+// value to be passed into the `is_sorted` argument of vlookup formula
+var IS_SORTED = "TRUE";
 // name of experiment to be written to results sheet
-var EXPER_NAME = "sort tests"
+var EXPER_NAME = "lookup tests"
 // sheet name of results spreadsheet to be written to
 var SHEET_NAME = "method 1"
 
-// TODO: Change values in sort function
+// TODO: Change values in vlookup function
 
 /* ============= END OF PARAMETERS ============= */
 
@@ -27,7 +30,7 @@ function loop() {
   var tenruns = []; // to average across 10 trials
   for (j = 0; j < 10; j++) {
     for (i = 0; i < sizes.length; i++) {
-      var ret = sort(sizes[i], urls[sizes[i]]);
+      var ret = vlookup(sizes[i], urls[sizes[i]]);
       results.push(ret);
     }
     tenruns.push(results);
@@ -99,28 +102,31 @@ function writeInter(sheet, results) {
   }
 }
 
-/*  Measures time to sort `size` rows of the spreadsheet specified by `url`. */
-function sort(size, url) {
-  var sheet = SpreadsheetApp.openByUrl(url).getActiveSheet();
+/*  Measures time to vlookup `size` rows on the spreadsheet specified by `url`. */
+function vlookup(size, url) {
+  var ss = SpreadsheetApp.openByUrl(url);
+  var sheet = ss.getActiveSheet();
+  sheet.insertColumnBefore(1);
+  var rws = sheet.getLastRow();
 
-  // add a column with numbers 1-size so that we can undo the sort
-  sheet.insertColumns(18);
-  var vals = [];
-  for (z = 0; z <= size; z++) {
-    vals.push([i]);
+  // add data to look for, numbers 1-size in ascending order
+  var data = sheet.getRange(2, 1, rws, 1).getValues();
+  for (z = 0; z < rws; z++) {
+    data[z][0] = z;
   }
-  sheet.getRange(1, 18, size + 1, 1).setValues(vals);
+  sheet.getRange(2, 1, rws, 1).setValues(data);
 
-  // now do the sort
-  var range = sheet.getRange("A1:R" + (size + 1));
   var startDate = new Date();
-  range.sort({ column: 1, ascending: false });
-  var x = sheet.getRange(5, 2).getValue();
+  var oldval = sheet.getRange(4, 18).getValue(); // replace
+  sheet.getRange(4, 18).setFormula("=VLOOKUP(9123, A1:J" + size + ", 3, " + IS_SORTED + ")"); // replace
+  // get value to ensure update is complete
+  var count = sheet.getRange(4, 18).getValue(); // replace
   var endDate = new Date();
 
-  // clean up
-  range.sort({ column: 18, ascending: true });
-  sheet.deleteColumn(18);
-  var ret = endDate.getTime() - startDate.getTime();
+  // clean up (necessary if not working on copy)
+  sheet.getRange(4, 18).setValue(oldval); // replace
+  sheet.deleteColumn(1);
+
+  ret = endDate.getTime() - startDate.getTime();
   return ret;
 }
