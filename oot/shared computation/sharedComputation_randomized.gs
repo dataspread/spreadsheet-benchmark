@@ -56,29 +56,34 @@ function reusable(size, url) {
     // copy is added to "Recent", not to location of original spreadsheet
     var ss = ss.copy(ss.getName() + "_" + Date.now());
     var sheet = ss.getActiveSheet();
+    // insert two columns at the beginning
+    sheet.insertColumnBefore(1);
+    sheet.insertColumnBefore(1);
     // insert formulas that use previous cell's result
     var data = sheet.getRange(1, 1, size, 2).getValues();
     data[0][0] = "1";
-    data[0][1] = "=P1";
+    data[0][1] = "=A1";
     for (z = 1; z < size; z++) {
         data[z][0] = z + 1;
-        data[z][1] = "=Q" + z + "+P" + (z + 1);
+        data[z][1] = "=B" + z + "+A" + (z + 1);
     }
-    sheet.getRange(1, 16, size, 2).setValues(data);
+    sheet.getRange(1, 1, size, 2).setValues(data);
 
-    var oldVal = sheet.getRange(1, 16).getValue();
+    var oldVal = sheet.getRange(1, 1).getValue();
     console.log(oldVal);
 
     var date = new Date();
     // update inital value and get the final result
-    sheet.getRange(1, 16).setValue(oldVal + 1);
-    var count = sheet.getRange(size, 17).getValue();
+    sheet.getRange(1, 1).setValue(oldVal + 1);
+    var count = sheet.getRange(size, 2).getValue();
     var endDate = new Date();
 
     console.log("count is " + count);
+    // clean up and delete first two columns
+    sheet.deleteColumn(1);
+    sheet.deleteColumn(1);
+
     ret = endDate.getTime() - date.getTime();
-    // clean up
-    sheet.getRange(1, 16, size, 2).clear();
     return ret;
 }
 
@@ -91,26 +96,33 @@ function repeated(size, url) {
     // copy is added to "Recent", not to location of original spreadsheet
     var ss = ss.copy(ss.getName() + "_" + Date.now());
     var sheet = ss.getActiveSheet();
+    // insert two columns at the beginning
+    sheet.insertColumnBefore(1);
+    sheet.insertColumnBefore(1);
     // insert formulas that calculate from scratch
     var data = sheet.getRange(1, 1, size, 2).getValues();
     data[0][0] = "1";
-    data[0][1] = "=P1";
+    data[0][1] = "=A1";
     for (z = 1; z < size; z++) {
         data[z][0] = z + 1;
-        data[z][1] = "=SUM(P1:P" + (z + 1) + ")";
+        data[z][1] = "=SUM(A1:A" + (z + 1) + ")";
     }
-    sheet.getRange(1, 16, size, 2).setValues(data);
+    sheet.getRange(1, 1, size, 2).setValues(data);
 
-    var oldVal = sheet.getRange(1, 16).getValue();
+    var oldVal = sheet.getRange(1, 1).getValue();
     console.log(oldVal);
+
     var date = new Date();
     // update inital value and get the final result
-    sheet.getRange(1, 16).setValue(oldVal + 1);
-    var count = sheet.getRange(size, 17).getValue();
+    sheet.getRange(1, 1).setValue(oldVal + 1);
+    var count = sheet.getRange(size, 2).getValue();
     var endDate = new Date();
+
     console.log("count is " + count);
+    // clean up and delete first two columns
+    sheet.deleteColumn(1);
+    sheet.deleteColumn(1);
+
     ret = endDate.getTime() - date.getTime();
-    // clean up
-    sheet.getRange(1, 16, size, 2).clear();
     return ret;
 }
