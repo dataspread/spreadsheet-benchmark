@@ -44,10 +44,7 @@ Sub calculateRunTime(oDoc as Object, oSheet as Object, rowIndex As Long, rowSize
   'write results back to oDoc
   oSheet.getCellByPosition(0,rowIndex).String = rowSize 
   oSheet.getCellByPosition(1, rowIndex).String = totalTime/8
-
-
 End Sub
-
 
 'Runs experiments on all spreadsheets specified by  [minRows, maxRows] with stepSize increments.
 'This is the main function to be called for running the experiment.
@@ -77,5 +74,4 @@ Sub main
     calculateRunTime(oDoc,oSheet,rowIndex,i)
     rowIndex = rowIndex + 1   
   Next i
-
 End Sub

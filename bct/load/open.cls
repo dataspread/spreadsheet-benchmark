@@ -15,15 +15,15 @@ Attribute VB_Exposed = True
 
 Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   
-'Initialize Timer Variables
+'declare Timer Variables
   Dim StartTime As Double
   Dim SecondsElapsed As Double
   Dim Name As String
   
-  
   Max = -1
   Min = 1000000
   totalTime = 0
+  t = 10 `10 trials
 
   'RELATIVE_PATH ---> assign directory path here
   'FILE_PREFIX ---> assuming all the files in the directory have a common prefix followed by its number of rows
@@ -31,7 +31,7 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   Name = FILE_PREFIX & CStr(rowSize) & ".xlsx"
   FILE_PATH = Dir(RELATIVE_PATH & Name)
   
-  For j = 1 To 10 '10 trials
+  For j = 0 To t
     StartTime = Timer
     Workbooks.Open (FILE_PATH) 'open document
     SecondsElapsed = Round(Timer - StartTime, 2)
@@ -52,13 +52,9 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   
   totalTime = totalTime - Max - Min 'remove outliers
   
-  'write results back to .xlsm file
-
-  Sheets("import").Cells(rowIndex, 1).Value = rowSize 
-  
-  Sheets("import").Cells(rowIndex, 2).Value = totalTime / 8
-
-  
+  'write results back to result sheet
+  Sheets("Sheet1").Cells(rowIndex, 1).Value = rowSize   
+  Sheets("Sheet1").Cells(rowIndex, 2).Value = totalTime / 8  
 End Sub
 
 'Runs experiments on all spreadsheets specified by  [minRows, maxRows] with stepSize increments.
@@ -80,21 +76,19 @@ Sub main()
   Application.ScreenUpdating = False
   Application.DisplayAlerts = False
 
-  'add headers to the current /xlsm file where results will be written
-  Sheets("import").Cells(1, 1).Value = "Rows Imported"
-  Sheets("import").Cells(1, 2).Value = "Time (s)"
+  'add headers to the Sheet1 of result file (the .xlsm file)
+  Sheets("Sheet1").Cells(1, 1).Value = "Rows Imported"
+  Sheets("Sheet1").Cells(1, 2).Value = "Time (s)"
 
   rowIndex = 2 'row id where the current result will be written
   
   `iterate over all spreadsheets
   For i = minRows to maxRows+1 Step 10000
     calculateRunTime rowIndex, i
-    rowIndex = rowIndex + 1
-     
+    rowIndex = rowIndex + 1     
   Next i
   
   'display results in the result screen
   Application.ScreenUpdating = True
-
 End Sub
 
