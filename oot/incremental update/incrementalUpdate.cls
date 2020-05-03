@@ -45,7 +45,8 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   
   Application.CutCopyMode = False
   Workbooks(FILE_PATH).Close
-    
+  
+  Cells(2, 10).Value = 1 'initialize cell value to 1
   For j = 0 To t
       
     StartTime = GetTickCount
@@ -71,7 +72,9 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   Next J
   
   totalTime = totalTime - Max - Min
-  Cells(rowid, 28).Value = totalTime / 8
+  'write results back to result sheet
+  Sheets("Sheet1").Cells(rowIndex, 27).Value = rowSize   
+  Sheets("Sheet1").Cells(rowIndex, 28).Value = totalTime / 8 
   
 End Function
 
@@ -98,7 +101,9 @@ Sub main()
   'prevent screen updating when the macro is runnign
   Application.ScreenUpdating = False
   Application.DisplayAlerts = False
-
+  
+  Application.Calculation = xlManual 'set manual calculation mode
+  
   'add headers to the Sheet1 of result file (the .xlsm file)
   Sheets("Sheet1").Cells(1, 1).Value = "Rows Imported"
   Sheets("Sheet1").Cells(1, 2).Value = "Time (s)"

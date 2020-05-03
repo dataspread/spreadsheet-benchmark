@@ -48,7 +48,9 @@ Function reCalculateRunTime(ByVal rowid)
   Next J
   
   totalTime = totalTime - Max - Min
-  Cells(rowid, 28).Value = totalTime / 8
+  'write results back to result sheet
+  Sheets("Sheet1").Cells(rowIndex, 27).Value = rowSize   
+  Sheets("Sheet1").Cells(rowIndex, 28).Value = totalTime / 8 
   
 End Function
 
@@ -78,6 +80,8 @@ Sub main()
   'prevent screen updating when the macro is runnign
   Application.ScreenUpdating = False
   Application.DisplayAlerts = False
+  
+  Application.Calculation = xlManual 'set manual calculation mode
 
   'add headers to the Sheet1 of result file (the .xlsm file)
   Sheets("Sheet1").Cells(1, 1).Value = "Rows Imported"
@@ -86,7 +90,6 @@ Sub main()
   rowIndex = 2 'row id where the current result will be written
   
   `iterate over all instances
-  rowIndex = 2
   totalRows = 500000
   For J = minCount To maxCount+1 Step stepSize
     putFormula J, totalRows
