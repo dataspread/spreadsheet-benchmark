@@ -120,7 +120,9 @@ Sub main()
   calculateRunTime rowIndex, i
   rowIndex = rowIndex + 1   
   Next i
-
+  
+  rowIndex = 2 'row id where the current result will be written
+  
   `iterate over all spreadsheets for is_sorted = 1
   For i = minRows to maxRows+1 Step stepSize
   calculateRunTime rowIndex, i, 0, 1

@@ -99,7 +99,9 @@ Sub main
     calculateRunTime(oDoc,oSheet,rowIndex,i, 0)
     rowIndex = rowIndex + 1   
   Next i
-
+  
+  rowIndex = 1 'row id where the current result will be written
+  
   `iterate over all spreadsheets for is_sorted = 1
   For i = minRows to maxRows+1 Step stepSize
     calculateRunTime(oDoc,oSheet,rowIndex,i, 1)

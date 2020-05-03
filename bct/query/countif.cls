@@ -102,4 +102,3 @@ Sub main()
   'display results in the result screen
   Application.ScreenUpdating = True
 End Sub
-  
