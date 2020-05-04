@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+Private Declare Function GetTickCount Lib "kernel32" () As Long
 
 `Takes in reference to a result sheet, row index in the result sheet where
 `result will be written, and spreadsheet size (# of spreadsheet rows). 
@@ -14,7 +15,6 @@ Attribute VB_Exposed = True
 `The average excludes the max and min trial times for that spreadsheet size.
 
 Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
-  
 'declare Timer Variables
   Dim StartTime As Double
   Dim SecondsElapsed As Double
@@ -52,12 +52,12 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   Set rg = Range("J2:J" & CStr(rowSize + 1))
   
   For j = 0 To t    
-    StartTime = Timer    
+    StartTime = GetTickCount    
     Set cond1 = rg.FormatConditions.Add(xlCellValue, xlGreater, "0") 'set formatting condition
     With cond1
       .Interior.Color = vbGreen 'apply formatting, e.g., cell color, on cells satisfying condition
     End With
-    SecondsElapsed = Round(Timer - StartTime, 2)
+    SecondsElapsed = Round(GetTickCount - StartTime, 2)
     
     timeTaken = SecondsElapsed
     totalTime = totalTime + timeTaken
@@ -106,7 +106,7 @@ Sub main()
   rowIndex = 2 'row id where the current result will be written
   
   `iterate over all spreadsheets
-  For i = minRows to maxRows+1 Step 10000
+  For i = minRows to maxRows+1 Step stepSize
     calculateRunTime rowIndex, i
     rowIndex = rowIndex + 1 
   Next i

@@ -9,80 +9,117 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Private mlngStart As Long
 Private Declare Function GetTickCount Lib "kernel32" () As Long
-Function reCalculateRunTime(ByVal rowid)
-    
-'Initialize Timer Variables (milliseconds version, more error prone I believe)
-    Dim StartTime As Double
-    Dim SecondsElapsed As Double
-    
-    
- 'Remember time when macro starts
-    Max = -1
-    Min = 1000000
-    totalTime = 0
-    
-    MaxU = -1
-    MinU = 1000000
-    totalTimeU = 0
-        
-    For J = 1 To 10
-          
-        StartTime = GetTickCount
-               
-        Cells(2, 10).Value = 0
-        Application.Calculate
-    'Determine how many seconds code took to run
-        SecondsElapsed = Round(GetTickCount - StartTime, 2)
-        
-        timeTaken = SecondsElapsed
-        totalTime = totalTime + timeTaken
-          
-        If timeTaken > Max Then
-          Max = timeTaken
-        End If
-        If timeTaken < Min Then
-          Min = timeTaken
-        End If
-          
-        Cells(2, 10).Value = 1
-          
-    Next J
-    
-    totalTime = totalTime - Max - Min
-    Cells(rowid, 28).Value = totalTime / 8
-    
-End Function
 
+`Takes in reference to a result sheet, row index in the result sheet where
+`result will be written, and spreadsheet size (# of spreadsheet rows). 
+`Then repeates the experiment for t trials and average time to the results sheet. 
+`The average excludes the max and min trial times for that spreadsheet size.
 
-Function putFormula(ByVal rows)
-    Dim c As Range
+Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
+  Dim StartTime As Double
+  Dim SecondsElapsed As Double
+  Dim Name As String 
 
-    Set c = Range("J2:J" & CStr(rows))
+  Max = -1
+  Min = 1000000
+  totalTime = 0
+  t = 10 `10 trials
+    
+  'RELATIVE_PATH ---> assign directory path here
+  'FILE_PREFIX ---> assuming all the files in the directory have a common prefix followed by its number of rows
+  
+  Name = FILE_PREFIX & CStr(rowSize) & ".xlsx"
+  FILE_PATH = Dir(RELATIVE_PATH & Name)
+  sheetName = "Sheet1"
+  
+  Workbooks.Open (FILE_PATH)
+    
+  Workbooks(FILE_PATH).Worksheets(sheetName).Range("A1:O" & CStr(rowSize + 1)).Copy
+  
+  'Activate the destination worksheet
+  Sheets("Sheet1").Activate
+  'Select the target range
+  Range("A1").Select
+  'Paste in the target destination
+  ActiveSheet.Paste
+  
+  Application.CutCopyMode = False
+  Workbooks(FILE_PATH).Close
+  
+  Cells(2, 10).Value = 1 'initialize cell value to 1
 
+  putFormula rowSize
+  For j = 0 To t
       
-    Range("P1:P10000").Clear
-    For i = 1 To 100
-
-        Worksheets("Sheet1").Range("P" & CStr(i)).Formula = "=COUNTIF($J$2:$J$" & CStr(rows) & ",""1"")"
+    StartTime = GetTickCount
+    'Cells(rowIndex, 28).Value = Application.WorksheetFunction.CountIf(Range("J2:J" & rowSize), "1")
     
-    Next i
-
+    Cells(2, 10).Value = 0
+    Application.Calculate
+  'Determine how many seconds code took to run
+    SecondsElapsed = Round(GetTickCount - StartTime, 2)
+    
+    timeTaken = SecondsElapsed
+    totalTime = totalTime + timeTaken
+      
+    If timeTaken > Max Then
+      Max = timeTaken
+    End If
+    If timeTaken < Min Then
+      Min = timeTaken
+    End If
+      
+    Cells(2, 10).Value = 1
+      
+  Next J
+  
+  totalTime = totalTime - Max - Min
+  'write results back to result sheet
+  Sheets("Sheet1").Cells(rowIndex, 27).Value = rowSize   
+  Sheets("Sheet1").Cells(rowIndex, 28).Value = totalTime / 8 
+  
 End Function
 
-Sub main()
-    Application.ScreenUpdating = False
-    Application.DisplayAlerts = False
+'set the formulae
+Function putFormula(ByVal rows)
+  Range("T1:T1").Clear
+  Worksheets("Sheet1").Range("T1").Formula = "=COUNTIF($J$2:$J$" & CStr(rows) & ",""1"")"
+End Function
 
-    'add headers to the current /xlsm file where results will be written
-    Sheets("import").Cells(1, 1).Value = "Rows Imported"
-    Sheets("import").Cells(1, 2).Value = "Time (s)"
+'Runs experiments on all spreadsheets specified by  [minRows, maxRows] with stepSize increments.
+'This is the main function to be called for running the experiment.
 
-    rowIndex = 2
-    For J = 10000 To 500001 Step 10000
-        putFormula J
-        reCalculateRunTime rowIndex
-        rowIndex = rowIndex + 1
-    Next J
+Sub main() 
+  Dim i As Long
+  Dim minRows as Long
+  Dim maxRows as Long
+  Dim stepSize as Long
+  Dim rowIndex as Long
+
+  minRows = 10000 `min row size
+  maxRows = 50000 `max row size
+  stepSize = 10000 `increment row sizes by 10k
+
+  'prevent screen updating when the macro is runnign
+  Application.ScreenUpdating = False
+  Application.DisplayAlerts = False
+  
+  Application.Calculation = xlManual 'set manual calculation mode
+  
+  'add headers to the Sheet1 of result file (the .xlsm file)
+  Sheets("Sheet1").Cells(1, 1).Value = "Rows Imported"
+  Sheets("Sheet1").Cells(1, 2).Value = "Time (s)"
+
+  rowIndex = 2 'row id where the current result will be written
+  
+  `iterate over all spreadsheets
+  For i = minRows to maxRows+1 Step stepSize
+    calculateRunTime rowIndex, i
+    rowIndex = rowIndex + 1     
+  Next i
+  
+  'display results in the result screen
+  Application.ScreenUpdating = True
 End Sub
 
 

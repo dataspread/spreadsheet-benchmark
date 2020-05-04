@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
+Private Declare Function GetTickCount Lib "kernel32" () As Long
 
 `Takes in reference to a result sheet, row index in the result sheet where
 `result will be written, and spreadsheet size (# of spreadsheet rows). 
@@ -14,7 +15,6 @@ Attribute VB_Exposed = True
 `The average excludes the max and min trial times for that spreadsheet size.
 
 Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
-  
 'declare Timer Variables
   Dim StartTime As Double
   Dim SecondsElapsed As Double
@@ -32,9 +32,9 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   FILE_PATH = Dir(RELATIVE_PATH & Name)
   
   For j = 0 To t
-    StartTime = Timer
+    StartTime = GetTickCount
     Workbooks.Open (FILE_PATH) 'open document
-    SecondsElapsed = Round(Timer - StartTime, 2)
+    SecondsElapsed = Round(GetTickCount - StartTime, 2)
    
     Workbooks(Filename).Close 'close document
        
@@ -61,7 +61,6 @@ End Sub
 'This is the main function to be called for running the experiment.
 
 Sub main() 
-
   Dim i As Long
   Dim minRows as Long
   Dim maxRows as Long
@@ -83,7 +82,7 @@ Sub main()
   rowIndex = 2 'row id where the current result will be written
   
   `iterate over all spreadsheets
-  For i = minRows to maxRows+1 Step 10000
+  For i = minRows to maxRows+1 Step stepSize
     calculateRunTime rowIndex, i
     rowIndex = rowIndex + 1     
   Next i

@@ -24,19 +24,19 @@ Sub calculateRunTime(oDoc as Object, oSheet as Object, rowIndex As Long, rowSize
   url = ConvertToURL(FILE_PATH)
 
   For j = 0 To t
-	lTick = GetSystemTicks()
-	openedDoc = stardesktop.LoadComponentFromURL(url, "_blank",0, Prop()) 'open document
-	lTick = (GetSystemTicks() - lTick)
-	openedDoc.dispose 'close document
-	oSheet.getCellByPosition(2+j,rowIndex).String = lTick
-	totalTime = totalTime + lTick	 
-	If lTick > Max Then
-	   Max = lTick
-	End If
+	  lTick = GetSystemTicks()
+	  openedDoc = stardesktop.LoadComponentFromURL(url, "_blank",0, Prop()) 'open document
+	  lTick = (GetSystemTicks() - lTick)
+	  openedDoc.dispose 'close document
+	  oSheet.getCellByPosition(2+j,rowIndex).String = lTick
+	  totalTime = totalTime + lTick	 
+	  If lTick > Max Then
+      Max = lTick
+	  End If
 	
-	If lTick < Min Then
-	   Min = lTick
-	End If
+	  If lTick < Min Then
+      Min = lTick
+	  End If
   Next j
 
   totalTime = totalTime - Max - Min 'remove outliers
@@ -70,7 +70,7 @@ Sub main
   rowIndex = 1 'row id where the current result will be written
   
   `iterate over all spreadsheets
-  For i = minRows to maxRows+1 Step 10000
+  For i = minRows to maxRows+1 Step stepSize
     calculateRunTime(oDoc,oSheet,rowIndex,i)
     rowIndex = rowIndex + 1   
   Next i
