@@ -50,10 +50,10 @@ Sub calculateRunTime(oDoc as Object, oSheet as Object, rowIndex As Long, rowSize
       MakePropertyValue( "SourcePosition", OldDoc.sheets(0).getCellByPosition(9, 1).getCellAddress() ), _
       MakePropertyValue( "StyleName", "Good" )
       )) 
-    OldDoc.sheets(0).getCellRangeByName("J2:J"&rowCount).setPropertyValue("ConditionalFormat", oldCondFormat)
+    OldDoc.sheets(0).getCellRangeByName("J2:J"&rowSize).setPropertyValue("ConditionalFormat", oldCondFormat)
     lTick = (GetSystemTicks() - lTick)
     
-    OldDoc.sheets(0).getCellRangeByName("J2:J"&rowCount).setPropertyValue("ConditionalFormat", temp) 'clear formatting
+    OldDoc.sheets(0).getCellRangeByName("J2:J"&rowSize).setPropertyValue("ConditionalFormat", temp) 'clear formatting
     
     totalTime = totalTime + lTick
      
@@ -70,7 +70,7 @@ Sub calculateRunTime(oDoc as Object, oSheet as Object, rowIndex As Long, rowSize
   totalTime = totalTime - Max - Min
   
   'write results back to oDoc
-  oSheet.getCellByPosition(0,rowIndex).String = rowCount
+  oSheet.getCellByPosition(0,rowIndex).String = rowSize
   oSheet.getCellByPosition(1, rowIndex).String = totalTime/8
 End Sub
 

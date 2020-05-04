@@ -15,7 +15,7 @@ Private Declare Function GetTickCount Lib "kernel32" () As Long
 `Then repeates the experiment for t trials and average time to the results sheet. 
 `The average excludes the max and min trial times for that spreadsheet size.
 
-Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
+Sub calculateRunTime(ByVal rowIndex, ByVal rowSize, ByVal strategy)
   Dim StartTime As Double
   Dim SecondsElapsed As Double
   Dim Name As String 
@@ -45,9 +45,10 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   
   Application.CutCopyMode = False
   Workbooks(FILE_PATH).Close
+
+  putFormula rowSize, strategy
     
   For j = 0 To t
-      
     StartTime = GetTickCount
     If Val(Application.Version) >= 12 Then
         Range("P1:P" & CStr(formulaCount)).CalculateRowMajorOrder
@@ -86,7 +87,12 @@ Function putFormula(ByVal rows, ByVal strategy)
     End If
     
     If strategey = 1 Then 'resuable computation
-      Worksheets("Sheet1").Range("P" & CStr(i)).Formula = "=SUM(P" & CStr(i - 1) & ",J" & CStr(i + 1) & ")"  
+      If i=1 Then
+        Worksheets("Sheet1").Range("P" & CStr(i)).Formula = "=SUM(0,J" & CStr(i + 1) & ")" 
+      End If
+      If i > 1 Then
+        Worksheets("Sheet1").Range("P" & CStr(i)).Formula = "=SUM(P" & CStr(i - 1) & ",J" & CStr(i + 1) & ")"  
+      End If
     End If
   Next i
 End Function
@@ -120,8 +126,7 @@ Sub main()
   `iterate over all spreadsheets
   rowIndex = 2
   For J = minRows To maxRows+1 Step stepSize
-    putFormula J, 0
-    reCalculateRunTime rowIndex, J
+    reCalculateRunTime rowIndex, J, 0
     rowIndex = rowIndex + 1
   Next J
 
@@ -130,8 +135,7 @@ Sub main()
   `iterate over all spreadsheets
   rowIndex = 2
   For J = minRows To maxRows+1 Step stepSize
-    putFormula J, 1
-    reCalculateRunTime rowIndex, J
+    reCalculateRunTime rowIndex, J, 1
     rowIndex = rowIndex + 1
   Next J
 

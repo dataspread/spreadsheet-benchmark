@@ -47,6 +47,8 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
   Workbooks(FILE_PATH).Close
   
   Cells(2, 10).Value = 1 'initialize cell value to 1
+
+  putFormula rowSize
   For j = 0 To t
       
     StartTime = GetTickCount
@@ -112,7 +114,6 @@ Sub main()
   
   `iterate over all spreadsheets
   For i = minRows to maxRows+1 Step stepSize
-    putFormula i
     calculateRunTime rowIndex, i
     rowIndex = rowIndex + 1     
   Next i

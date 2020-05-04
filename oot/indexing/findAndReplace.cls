@@ -66,14 +66,17 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize, ByVal Search, ByVal Replacem
 
     If SecondsElapsed < Min Then
       Min = SecondsElapsed
-    End If         
+    End If 
+
+    Worksheets("Sheet1").Range("A1:O" & CStr(rowSize + 1)).Replace What:=Replacement, Replacement:=Search, _
+        SearchOrder:=xlByRows, MatchCase:=False        'reset spreadsheet
   Next j
   
   totalTime = totalTime - Max - Min 'remove outliers
   
   'write results back to result sheet
-  Sheets("Sheet1").Cells(rowIndex, 1).Value = rowSize   
-  Sheets("Sheet1").Cells(rowIndex, columnIndex).Value = totalTime / 8  
+  Sheets("Sheet1").Cells(rowIndex, 28).Value = rowSize   
+  Sheets("Sheet1").Cells(rowIndex, 28+columnIndex).Value = totalTime / 8  
 End Sub
 
 'Runs experiments on all spreadsheets specified by  [minRows, maxRows] with stepSize increments.

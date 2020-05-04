@@ -11,7 +11,7 @@ Private mlngStart As Long
 Private Declare Function GetTickCount Lib "kernel32" () As Long
 
 'recalculate all the formula instances for the given spreadsheet
-Function reCalculateRunTime(ByVal rowid)
+Function reCalculateRunTime(ByVal rowIndex, ByVal rowCount, ByVal totalRows)
 'Initialize Timer Variables (milliseconds version, more error prone I believe)
   Dim StartTime As Double
   Dim SecondsElapsed As Double
@@ -27,6 +27,7 @@ Function reCalculateRunTime(ByVal rowid)
   totalTimeU = 0
   
   Cells(2, 10).Value = 1 'initialize cell value to 1
+  putFormula rowCount, totalRows
   For J = 0 To t
       
     StartTime = GetTickCount    
@@ -92,8 +93,7 @@ Sub main()
   `iterate over all instances
   totalRows = 500000
   For J = minCount To maxCount+1 Step stepSize
-    putFormula J, totalRows
-    reCalculateRunTime rowIndex
+    reCalculateRunTime rowIndex, J, totalRows
     rowIndex = rowIndex + 1
   Next J
 End Sub

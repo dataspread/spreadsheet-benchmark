@@ -78,11 +78,11 @@ Sub calculateRunTime(ByVal rowIndex, ByVal rowSize)
     End If
     
     totalTimeOne = totalTimeOne + timeOne
-    If timeTakenOne > Max Then
-      Max = timeTakenOne
+    If timeOne > MaxOne Then
+      MaxOne = timeOne
     End If
-    If timeTakenOne < MinOne Then
-      MinOne = timeTakenOne
+    If timeOne < MinOne Then
+      MinOne = timeOne
     End If
   Next k
   

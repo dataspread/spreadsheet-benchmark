@@ -69,7 +69,7 @@ Sub calculateRunTime(oDoc as Object, oSheet as Object, rowIndex As Long, rowSize
   totalTime = totalTime - Max - Min 'remove outliers
   
   'write results back to oDoc  
-  oSheet.getCellByPosition(0,rowIndex).String = rowCount
+  oSheet.getCellByPosition(0,rowIndex).String = rowSize
   oSheet.getCellByPosition(1, rowIndex).String = totalTime/8
 End Sub
 

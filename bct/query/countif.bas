@@ -30,7 +30,7 @@ Sub calculateRunTime(oDoc as Object, oSheet as Object, rowIndex As Long, rowSize
 
   oSvc = createUnoService( "com.sun.star.sheet.FunctionAccess")
   condition = "1"
-  oCellRange = OldDoc.sheets(0).getCellRangeByName("J2:J"&rowCount)
+  oCellRange = OldDoc.sheets(0).getCellRangeByName("J2:J"&rowSize)
   oArg = Array(oCellRange, condition) 'array of arguments
   
   For j = 0 To t
@@ -40,20 +40,20 @@ Sub calculateRunTime(oDoc as Object, oSheet as Object, rowIndex As Long, rowSize
     
     totalTime = totalTime + lTick
 		     
-	If lTick > Max Then
-	   Max = lTick
-	End If
+	  If lTick > Max Then
+	    Max = lTick
+	  End If
 	
     If lTick < Min Then
-	   Min = lTick
-	End If
+	    Min = lTick
+	  End If
   Next j
 
   OldDoc.dispose 'close document  
   totalTime = totalTime - Max - Min 'remove outliers
   
   'write results back to oDoc
-  oSheet.getCellByPosition(0,rowIndex).String = rowCount
+  oSheet.getCellByPosition(0,rowIndex).String = rowSize
   oSheet.getCellByPosition(1, rowIndex).String = totalTime/8
 End Sub
 
