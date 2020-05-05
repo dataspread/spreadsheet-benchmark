@@ -13,10 +13,10 @@ var urls = {
   // ...
 };
 
-// whether to access sequentially or random
-var SEQUENTIAL_ACCESS = true;
+// whether to range access or random column access
+var RANGE_ACCESS = true;
 // name of experiment to be written to results sheet
-var EXPER_NAME = "column layout tests";
+var EXPER_NAME = "row layout tests"
 // sheet name of results spreadsheet to be written to
 var SHEET_NAME = "method 1";
 
@@ -30,10 +30,10 @@ function loop() {
   for (j = 0; j < 10; j++) {
     for (i = 0; i < sizes.length; i++) {
       var size = sizes[i];
-      if (SEQUENTIAL_ACCESS) {
-        var ret = sequential(size, urls[size]);
+      if (RANGE_ACCESS) {
+        var ret = rangeAccess(size, urls[size]);
       } else {
-        var ret = random(size, urls[size]);
+        var ret = randomColumnAccess(size, urls[size]);
       }
       results.push(ret);
     }
@@ -106,43 +106,61 @@ function writeInter(sheet, results) {
   }
 }
 
-/*  Measures time to access `size` rows sequentially within the first column on the 
-    spreadsheet specified by `url`.
+/*  Measures time to range access `size` row spreadsheet specified by `url`.
     Experiment is performed on copy of the spreadsheet. */
-function sequential(size, url) {
+function rangeAccess(size, url) {
   var ss = SpreadsheetApp.openByUrl(url);
-  // perform experiment on copy of spreadsheet
-  // copy is added to "Recent", not to location of original spreadsheet
-  var ss = ss.copy(ss.getName() + "_" + Date.now());
   var sheet = ss.getActiveSheet();
   var startDate = new Date();
-  for (i = 1; i < size; i++) {
-    var temp = sheet.getRange(i, 1);
-  }
+  var result = 0;
+  var resultCell = sheet.getRange(4, 19); // single cell
+  var oldval = resultCell.getValue();
+  resultCell.setFormula("=COUNT(A2:R" + size + ")");
+  result += resultCell.getValue();
+
   var endDate = new Date();
+
+  // clean up
+  resultCell.setValue(oldval);
 
   return (endDate.getTime() - startDate.getTime());
 }
 
-/*  Measures time to access `size` rows in random order on the spreadsheet specified by `url`.
-    Experiment is performed on copy of the spreadsheet. */
-function random(size, url) {
-  var ss = SpreadsheetApp.openByUrl(url);
-  // perform experiment on copy of spreadsheet
-  // copy is added to "Recent", not to location of original spreadsheet
-  var ss = ss.copy(ss.getName() + "_" + Date.now());
-  var sheet = ss.getActiveSheet();
-  var rows = [];
-  for (i = 1; i < size; i++) {
-    rows.push(i);
+
+function columnToLetter(column) {
+  var temp, letter = '';
+  while (column > 0) {
+    temp = (column - 1) % 26;
+    letter = String.fromCharCode(temp + 65) + letter;
+    column = (column - temp - 1) / 26;
   }
-  // shuffle order of rows to access
-  var shuffled = shuffle(rows);
+  return letter;
+}
+
+/*  Measures time to access columns in sheet in random order on `size` row spreadsheet specified by `url`.
+    Experiment is performed on copy of the spreadsheet. */
+function randomColumnAccess(size, url) {
+  var ss = SpreadsheetApp.openByUrl(url);
+  var sheet = ss.getActiveSheet();
+  var columns = [];
+  var lastColumn = sheet.getLastColumn();
+  for (var i = 1; i <= lastColumn; i++) {
+    columns.push(columnToLetter(i));
+  }
+  var shuffled = shuffle(columns);
+  var result = 0;
   var startDate = new Date();
-  for (j = 0; j < shuffled.length; j++) {
-    var temp = sheet.getRange(shuffled[j], 1);
+  var resultCell = sheet.getRange(4, 19);
+  var oldval = resultCell.getValue();
+
+  for (var j = 0; j < shuffled.length; j++) {
+    resultCell.setFormula("=COUNT(" + shuffled[j] + "1:" + shuffled[j] + size + ")");
+    result += resultCell.getValue();
   }
   var endDate = new Date();
+
+  // clean up
+  resultCell.setValue(oldval);
 
   return (endDate.getTime() - startDate.getTime());
 }
