@@ -3,6 +3,9 @@
 
 // url of the spreadsheet to write the results
 var RESULTS_URL = "results_url"; // e.g. "https://docs.google.com/spreadsheets/d/ABCXYZ/edit" 
+// spreadsheet sizes to run experiment on
+// script may time out if sizes is too large, so sizes should be subset of urls
+var sizes = [size1, size2, ...]; // e.g. [10000, 20000]
 // mapping from spreadsheet row counts to url of spreadsheet
 var urls = {
   size1: "url1", // e.g. 10000: "https://docs.google.com/spreadsheets/d/ABCXYZ/edit"
