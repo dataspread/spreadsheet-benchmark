@@ -112,7 +112,9 @@ Following is the benchmark organization:
 │   ├── indexing
 │   └── shared computation
 ├── .gitignore
-└── README.md
+├── RANDOMIZED_SETUP.md
+├── README.md
+└── script.py
 ```
 
 ## Running an experiment 
