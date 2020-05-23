@@ -99,16 +99,52 @@ To clone the repository use: `git clone https://github.com/dataspread/spreadshee
 
 The `/bct` and `/oot` directories contain the BCT and OOT benchmark experiments, respecticely.
 Each benchmark is further categorized based on operations (BCT) or optimizations (OOT) tested. 
+Following is the benchmark organization:
 
-.
- * [tree-md](./tree-md)
- * [dir2](./dir2)
-   * [file21.ext](./dir2/file21.ext)
-   * [file22.ext](./dir2/file22.ext)
-   * [file23.ext](./dir2/file23.ext)
- * [dir1](./dir1)
-   * [file11.ext](./dir1/file11.ext)
-   * [file12.ext](./dir1/file12.ext)
- * [file_in_root.ext](./file_in_root.ext)
- * [README.md](./README.md)
- * [dir3](./dir3)
+```bash
+├── bct
+│   ├── load
+│   ├── query
+│   └── update
+├── oot
+│   ├── data layout
+│   ├── incremental update
+│   ├── indexing
+│   └── shared computation
+├── .gitignore
+└── README.md
+```
+
+## Running an experiment 
+
+First, create a `/data` directory locally (for Excel and Calc) or
+in Google Drive (for Google Sheets) and save your experimental datasets there. 
+The process of running an experiment varies with each spreadsheet system which we explain next.
+
+### Excel
+
+Create a `.xlsm` file and open the Excel visual basic editor:
+
+```
+Click the "Visual Basic" button on the "Developer" tab.
+
+If the Developer tab is not present, go to File -> Options -> customize ribbon and tick Developer.
+
+You can also open VBA in Excel using Alt + F11 keyboard shortcut.
+```
+Load a `.cls` file from the `Import File ...` option in the `File` menu.
+
+Click `run` to launch an experiment.
+
+### Calc
+
+```
+Create a .ods file
+Open the VBA editor
+Load a .bas file
+Click run to launch an experiment
+```
+
+### Google Sheets
+
+todo
