@@ -55,7 +55,7 @@ Calc basic for Calc, and Google apps script (_GAS_) for Google Sheets.
 The file extension for VBA, Calc basic, and GAS scripts are _.cls_, _.bas_, and _.gs_, respectively.
 All the experiments are single threaded. 
 
-## Experiments: Datasets and APIs
+## Expeiment files and dataset
 For each experiment in Excel, we first 
 create an Excel Macro-Enabled Workbook (_.xlsm_) 
 which can execute embedded macros programmed in VBA. 
@@ -93,3 +93,22 @@ to fit in the experiment trials for different test cases
 within the allocated daily quotas
 
 # Benchmarking
+
+To get started with the _spreadsheet-benchmark_, first clone or down the repository. 
+To clone the repository use: `git clone https://github.com/dataspread/spreadsheet-benchmark.git`
+
+The `/bct` and `/oot` directories contain the BCT and OOT benchmark experiments, respecticely.
+Each benchmark is further categorized based on operations (BCT) or optimizations (OOT) tested. 
+
+.
+ * [tree-md](./tree-md)
+ * [dir2](./dir2)
+   * [file21.ext](./dir2/file21.ext)
+   * [file22.ext](./dir2/file22.ext)
+   * [file23.ext](./dir2/file23.ext)
+ * [dir1](./dir1)
+   * [file11.ext](./dir1/file11.ext)
+   * [file12.ext](./dir1/file12.ext)
+ * [file_in_root.ext](./file_in_root.ext)
+ * [README.md](./README.md)
+ * [dir3](./dir3)
