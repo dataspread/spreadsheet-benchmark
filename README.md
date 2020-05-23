@@ -138,12 +138,18 @@ Click `run` to launch an experiment.
 
 ### Calc
 
+Create a `.ods` file and create a `module` for the macro to be placed into:
+
 ```
-Create a .ods file
-Open the VBA editor
-Load a .bas file
-Click run to launch an experiment
+From menu open Tools->Macros->Organize Macros->Libre Office Basic.
+
+On the following dialog select the library (such as Standard) where to create the module. 
+
+Then click new & give it a name (based on your experiment. You can reuse the respective .bas file name)
 ```
+Double click on the `module` to open the code editor. Then from menu select `File->Import Basic` and select your `.bas` file.
+
+Click `run` to launch an experiment.
 
 ### Google Sheets
 
