@@ -30,7 +30,7 @@ evaluate the relative performance of the spreadsheet
 systems on a range of data sizes.
 
 ## Optimization Opportunities Testing (OOT) 
-The OOT benchmark invesigates
+The OOT benchmark investigates
 whether
 spreadsheet systems
 take advantage of
@@ -53,9 +53,9 @@ we implemented the experiments in their corresponding scripting language:
 Visual basic (_VBA_) for Excel, 
 Calc basic for Calc, and Google apps script (_GAS_) for Google Sheets. 
 The file extension for VBA, Calc basic, and GAS scripts are _.cls_, _.bas_, and _.gs_, respectively.
-All the experiments are single threaded. 
+All the experiments are single-threaded. 
 
-## Expeiment files and dataset
+## Experiment files and dataset
 For each experiment in Excel, we first 
 create an Excel Macro-Enabled Workbook (_.xlsm_) 
 which can execute embedded macros programmed in VBA. 
@@ -97,7 +97,7 @@ within the allocated daily quotas
 To get started with the _spreadsheet-benchmark_, first clone or down the repository. 
 To clone the repository use: `git clone https://github.com/dataspread/spreadsheet-benchmark.git`
 
-The `/bct` and `/oot` directories contain the BCT and OOT benchmark experiments, respecticely.
+The `/bct` and `/oot` directories contain the BCT and OOT benchmark experiments, respectively.
 Each benchmark is further categorized based on operations (BCT) or optimizations (OOT) tested. 
 Following is the benchmark organization:
 
@@ -114,7 +114,7 @@ Following is the benchmark organization:
 ├── .gitignore
 ├── randomized_setup.md
 ├── README.md
-└── script.py
+└── randomized_script.py
 ```
 
 ## Running an experiment 
@@ -145,11 +145,11 @@ Create a `.ods` file and create a `module` for the macro to be placed into:
 ```
 From menu open Tools->Macros->Organize Macros->Libre Office Basic.
 
-On the following dialog select the library (such as Standard) where to create the module. 
+On the following dialog select the library (such as Standard) to create the module. 
 
 Then click new & give it a name (based on your experiment. You can reuse the respective .bas file name)
 ```
-Double click on the `module` to open the code editor. Then from menu select `File->Import Basic` and select your `.bas` file.
+Double click on the `module` to open the code editor. Then from the menu select `File->Import Basic` and select your `.bas` file.
 
 Click `run` to launch an experiment.
 
@@ -160,9 +160,9 @@ Create a new project in the Google Apps Script home. Copy the contents from a `.
 To launch the experiment, go to `Run->Run function` in the menu and select the main function you want to run. You are unable to pass any parameters into the function through this method.
 
 There are three methods we explored in running Google Sheets experiments:
-1. All trials run during a script execution
-2. One trial per script execution via Trigger
-3. One trial per script execution via API
+1. All trials of a given experiment are run during a script execution
+2. One trial per script execution is run via [Trigger](https://developers.google.com/apps-script/guides/triggers)
+3. One trial per script execution is run via [API](https://developers.google.com/apps-script/api/quickstart/python)
 
 #### Method 1
 No changes need to be made for method 1.
@@ -173,4 +173,4 @@ To randomize the order of dataset sizes that would run the experiment on and avo
 A configuration of `hello_world`, `Head`, `Time-driven`, `Minutes Timer`, and `Every minute` will run the current version of the `hello_world` function every minute. It is recommended that you configure the time interval to be greater than the runtime of your script to avoid overlap of script execution, which could lead to concurrency issues if you're using the same data.
 
 #### Method 3 (randomized_setup.md)
-Method 3 follows the same incentive with the addition of predetermining the order of the trials and increasing efficiency. In order to run the randomized trial GS scripts, refer to `randomized_setup.md`.
+Method 3 follows the same incentive with the addition of predetermining the order of the trials and increasing efficiency. To run the randomized trial GS scripts, refer to [randomized_setup.md](randomized_setup.md).
