@@ -13,14 +13,12 @@ var urls = {
   // ...
 };
 
+// whether to range access or random column access
+var RANGE_ACCESS = true;
 // name of experiment to be written to results sheet
-var EXPER_NAME = "shared computation tests";
+var EXPER_NAME = "row layout tests"
 // sheet name of results spreadsheet to be written to
 var SHEET_NAME = "method 1";
-// whether experiment repeats computation or reuse intermediate results
-var IS_REPEATED = true;
-
-// TODO: Change values in `repeated` and `reusable` functions
 
 /* ============= END OF PARAMETERS ============= */
 
@@ -32,10 +30,10 @@ function loop() {
   for (j = 0; j < 10; j++) {
     for (i = 0; i < sizes.length; i++) {
       var size = sizes[i];
-      if (IS_REPEATED) {
-        var ret = repeated(size, urls[size]);
+      if (RANGE_ACCESS) {
+        var ret = rangeAccess(size, urls[size]);
       } else {
-        var ret = reusable(size, urls[size]);
+        var ret = randomColumnAccess(size, urls[size]);
       }
       results.push(ret);
     }
@@ -108,76 +106,75 @@ function writeInter(sheet, results) {
   }
 }
 
-/*  Measures time to compute sum using intermediate results on spreadsheet of 
-    size `size` specified by `url`.
+/*  Measures time to range access `size` row spreadsheet specified by `url`.
     Experiment is performed on copy of the spreadsheet. */
-function reusable(size, url) {
+function rangeAccess(size, url) {
   var ss = SpreadsheetApp.openByUrl(url);
   var sheet = ss.getActiveSheet();
-  // insert two columns at the beginning
-  sheet.insertColumnBefore(1);
-  sheet.insertColumnBefore(1);
-  // insert formulas that use previous cell's result
-  var data = sheet.getRange(1, 1, size, 2).getValues();
-  data[0][0] = "1";
-  data[0][1] = "=A1";
-  for (z = 1; z < size; z++) {
-    data[z][0] = z + 1;
-    data[z][1] = "=B" + z + "+A" + (z + 1);
-  }
-  sheet.getRange(1, 1, size, 2).setValues(data);
+  var startDate = new Date();
+  var result = 0;
+  var resultCell = sheet.getRange(4, 19); // single cell
+  var oldval = resultCell.getValue();
+  resultCell.setFormula("=COUNT(A2:R" + size + ")");
+  result += resultCell.getValue();
 
-  var oldVal = sheet.getRange(1, 1).getValue();
-  console.log(oldVal);
-
-  var date = new Date();
-  // update inital value and get the final result
-  sheet.getRange(1, 1).setValue(oldVal + 1);
-  var count = sheet.getRange(size, 2).getValue();
   var endDate = new Date();
 
-  console.log("count is " + count);
-  // clean up and delete first two columns
-  sheet.deleteColumn(1);
-  sheet.deleteColumn(1);
+  // clean up
+  resultCell.setValue(oldval);
 
-  ret = endDate.getTime() - date.getTime();
-  return ret;
+  return (endDate.getTime() - startDate.getTime());
 }
 
-/*  Measures time to compute sum without using intermediate results on spreadsheet of 
-    size `size` specified by `url`.
+
+function columnToLetter(column) {
+  var temp, letter = '';
+  while (column > 0) {
+    temp = (column - 1) % 26;
+    letter = String.fromCharCode(temp + 65) + letter;
+    column = (column - temp - 1) / 26;
+  }
+  return letter;
+}
+
+/*  Measures time to access columns in sheet in random order on `size` row spreadsheet specified by `url`.
     Experiment is performed on copy of the spreadsheet. */
-function repeated(size, url) {
+function randomColumnAccess(size, url) {
   var ss = SpreadsheetApp.openByUrl(url);
   var sheet = ss.getActiveSheet();
-  // insert two columns at the beginning
-  sheet.insertColumnBefore(1);
-  sheet.insertColumnBefore(1);
-  // insert formulas that calculate from scratch
-  var data = sheet.getRange(1, 1, size, 2).getValues();
-  data[0][0] = "1";
-  data[0][1] = "=A1";
-  for (z = 1; z < size; z++) {
-    data[z][0] = z + 1;
-    data[z][1] = "=SUM(A1:A" + (z + 1) + ")";
+  var columns = [];
+  var lastColumn = sheet.getLastColumn();
+  for (var i = 1; i <= lastColumn; i++) {
+    columns.push(columnToLetter(i));
   }
-  sheet.getRange(1, 1, size, 2).setValues(data);
+  var shuffled = shuffle(columns);
+  var result = 0;
+  var startDate = new Date();
+  var resultCell = sheet.getRange(4, 19);
+  var oldval = resultCell.getValue();
 
-  var oldVal = sheet.getRange(1, 1).getValue();
-  console.log(oldVal);
-
-  var date = new Date();
-  // update inital value and get the final result
-  sheet.getRange(1, 1).setValue(oldVal + 1);
-  var count = sheet.getRange(size, 2).getValue();
+  for (var j = 0; j < shuffled.length; j++) {
+    resultCell.setFormula("=COUNT(" + shuffled[j] + "1:" + shuffled[j] + size + ")");
+    result += resultCell.getValue();
+  }
   var endDate = new Date();
 
-  console.log("count is " + count);
-  // clean up and delete first two columns
-  sheet.deleteColumn(1);
-  sheet.deleteColumn(1);
+  // clean up
+  resultCell.setValue(oldval);
 
-  ret = endDate.getTime() - date.getTime();
-  return ret;
+  return (endDate.getTime() - startDate.getTime());
+}
+
+/* Shuffles `array1` by swapping each element randomly */
+function shuffle(array1) {
+  var ctr = array1.length, temp, index;
+
+  while (ctr > 0) {
+    index = Math.floor(Math.random() * ctr);
+    ctr--;
+    temp = array1[ctr];
+    array1[ctr] = array1[index];
+    array1[index] = temp;
+  }
+  return array1;
 }

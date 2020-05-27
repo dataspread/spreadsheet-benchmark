@@ -1,40 +1,40 @@
-// previous url: https://docs.google.com/spreadsheets/d/1EFwjPEvK74Py3jWNer9rlE5JsSmwMHVGlGPUNuIBEiQ/edit#gid=0
-var DATA_SHEET = "https://docs.google.com/spreadsheets/d/18m0aPe84ZH4_MOOsgyNhUCQPkTFMbgyDCjTpDMKAcdc/edit#gid=0";
+// TODO: REPLACE ALL PARAMETERS WITH VALUES SPECIFIC TO EXPERIMENT
+/* ============= START OF PARAMETERS ============= */
 
+// url of the spreadsheet to write the results
+var RESULTS_URL = "results_url"; // e.g. "https://docs.google.com/spreadsheets/d/ABCXYZ/edit" 
+// spreadsheet sizes to run experiment on
+// script may time out if sizes is too large, so sizes should be subset of urls
+var sizes = [size1, size2, ...]; // e.g. [10000, 20000]
+// mapping from spreadsheet row counts to url of spreadsheet
+var urls = {
+  size1: "url1", // e.g. 10000: "https://docs.google.com/spreadsheets/d/ABCXYZ/edit"
+  size2: "url2",
+  // ...
+};
 
-// previous urls
-// NO FORMULA ---------------------
-//var size = 150;
-//var url = "https://docs.google.com/spreadsheets/d/1uScL1qDTNruOIkwBMLd4yyyy92MewGjfmXLKKt3ajkU/edit#gid=1208735331"
-//var size = 10000;
-//var url = "https://docs.google.com/spreadsheets/d/1tlg22qrIJ47GqOL3T6Unr0OjNrJhrU99MElV1ItMJ6g/edit#gid=107740236"
-//var size = 20000
-//var url = "https://docs.google.com/spreadsheets/d/1vIdwCaXV2ESwnXBkUF-GXlqgNCx-FsUu1H-I7ViVVCY/edit#gid=1901691147";
-//var size = 50000
-//var url = "https://docs.google.com/spreadsheets/d/1Rk3Id238caghcqA3PtAbLdRToCrdAjgt1PAI4_s_Zec/edit#gid=408570086";
-//var size = 80000;
-//var url = "https://docs.google.com/spreadsheets/d/17beCIdzMnv4sYjy8wWhe303VQnXUKAVtji6O3prhpn0/edit#gid=2057009412";
+// whether to access sequentially or random
+var SEQUENTIAL_ACCESS = true;
+// name of experiment to be written to results sheet
+var EXPER_NAME = "column layout tests";
+// sheet name of results spreadsheet to be written to
+var SHEET_NAME = "method 1";
 
-// 20k, 50k, 80k
-// 20k: https://docs.google.com/spreadsheets/d/1OJAKik4Ju3yq-u3ArmLkHOlr7bcbH16soWANFQ_Oktw/edit
-// 50k: https://docs.google.com/spreadsheets/d/1SpF4psgD1UC26FRJYRcnI87JUib6bHJQb1hkkue7kL0/edit
-// 80k: https://docs.google.com/spreadsheets/d/1Ii4WaFwAlbCTKawfx1NRW7uk6aWBygwrGDWPIye5-yE/edit
-// 10k: "https://docs.google.com/spreadsheets/d/1kgKdaOFx9gDUziGIsPKcs8hF875-KbfKwkQCARH73-s/edit#gid=1708501637
-//30k: https://docs.google.com/spreadsheets/d/1IaRR_SQt_MBDBQJSrmueU5ROC_N3-UEwrjslXovRRb0/edit#gid=1724899661
-// 20k: https://docs.google.com/spreadsheets/d/1XAAEgkasuNgDbOSpLHXCJnmEXUobmkhsqTyVd1XrZ1E/edit#gid=249543903
-var sizes = [20000] //10000, 20000, 30000
-var urls = ["https://docs.google.com/spreadsheets/d/1XAAEgkasuNgDbOSpLHXCJnmEXUobmkhsqTyVd1XrZ1E/edit#gid=249543903"];
+/* ============= END OF PARAMETERS ============= */
 
-var EXPER_NAME = "airbnb random row fetching tests"
+/*  Runs experiments on all spreadsheets specified by `sizes` array.
+    This is the main function to be called for running the experiment. */
 function loop() {
-
-  var results = []; // for inital fandr
+  var results = [];
   var tenruns = []; // to average across 10 trials
-  
-  for (z = 0; z < 10; z ++) {
+  for (j = 0; j < 10; j++) {
     for (i = 0; i < sizes.length; i++) {
-      //var ret = sequential(sizes[i], urls[i]);
-      var ret = random(sizes[i], urls[i]);
+      var size = sizes[i];
+      if (SEQUENTIAL_ACCESS) {
+        var ret = sequential(size, urls[size]);
+      } else {
+        var ret = random(size, urls[size]);
+      }
       results.push(ret);
     }
     tenruns.push(results);
@@ -43,115 +43,120 @@ function loop() {
   averageStats(tenruns);
 }
 
-function averageStats(t) {
-  // t is arry of 10 arrays, each size # experiments
-  // remove min and max
-  var results_sheet = SpreadsheetApp.openByUrl(DATA_SHEET).getActiveSheet();
-  var perNumber = [];
-  for (i = 0; i < t[0].length; i++) {
-    perNumber.push([]);
+/*  Takes in an array of trial times for all spreadsheet sizes and writes
+    the trial times and average time to the results sheet. 
+    The average excludes the max and min trial times for that spreadsheet size. */
+function averageStats(times) {
+  var results_sheet = SpreadsheetApp.openByUrl(RESULTS_URL).getSheetByName(SHEET_NAME);
+  var perSize = []; // get all the times for one size sheet
+  for (i = 0; i < times[0].length; i++) {
+    perSize.push([]);
   }
-  for (i = 0; i < t.length; i++) {
-    for (j = 0; j < t[i].length; j++) {
-      perNumber[j].push(t[i][j]);
+  for (i = 0; i < times.length; i++) {
+    for (j = 0; j < times[i].length; j++) {
+      perSize[j].push(times[i][j]);
     }
   }
 
   var results = [];
-  for (z = 0; z < perNumber.length; z++) {
-    cur = perNumber[z];
+  for (z = 0; z < perSize.length; z++) {
+    cur = perSize[z];
+    // write ALL trial times to results sheet (including max and min)
     writeInter(results_sheet, cur);
+    // remove min and max trial times
     cur.splice(cur.indexOf(Math.min.apply(null, cur)), 1);
     cur.splice(cur.indexOf(Math.max.apply(null, cur)), 1);
     var sum = 0;
     for (j = 0; j < cur.length; j++) {
-      sum+=cur[j];
+      sum += cur[j];
     }
-    results.push(sum/cur.length);
+    results.push(sum / cur.length);
   }
-
+  // write average times and metadata to results sheet
   writeToSheet(results_sheet, results);
 }
 
+/*  Writes the date, experiment name, trial times, sizes, and averaged results to a spreadsheet, 
+    and highlights the background of the result. 
+    This function is called by `averageStats`. */
 function writeToSheet(sheet, results) {
   var time = new Date();
-  var lastRow = sheet.getLastRow()+1;
+  var lastRow = sheet.getLastRow() + 1;
   sheet.getRange(lastRow, 1).setValue(Utilities.formatDate(time, 'America/Chicago', 'MMMM dd, yyyy HH:mm:ss Z'));
   lastRow++;
   sheet.getRange(lastRow, 1).setValue(EXPER_NAME);
   lastRow++;
+  // write all sizes to sheet
   for (i = 0; i < results.length; i++) {
-      sheet.getRange(lastRow, i+1).setValue(sizes[i]);
+    sheet.getRange(lastRow, i + 1).setValue(sizes[i]);
   }
   lastRow++;
+  // write all average times to sheet
   for (i = 0; i < results.length; i++) {
-    sheet.getRange(lastRow, i+1).setValue(results[i]).setBackground("orange");
+    sheet.getRange(lastRow, i + 1).setValue(results[i]).setBackground("orange");
   }
 }
 
+/*  Writes the intermediate trial times for one sized sheet.
+    This is a helper function called by `writeToSheet`. */
 function writeInter(sheet, results) {
-  var lastRow = sheet.getLastRow()+1;
+  var lastRow = sheet.getLastRow() + 1;
   for (i = 0; i < results.length; i++) {
-    sheet.getRange(lastRow, i+1).setValue(results[i]);
+    sheet.getRange(lastRow, i + 1).setValue(results[i]);
   }
 }
 
+/*  Measures time to access `size` rows sequentially within the first column on the 
+    spreadsheet specified by `url`.
+    Experiment is performed on copy of the spreadsheet. */
 function sequential(size, url) {
-  var sheet = SpreadsheetApp.openByUrl(url).getActiveSheet();
-  
-  var start = new Date();
-  var result = 0;
-  var resultCell = sheet.getRange(4,19) // single cell
-  resultCell.setFormula("=COUNT(A2:R" + size + ")");
-  result += resultCell.getValue();
- 
-  var end = new Date();
-  
-  return (end.getTime() - start.getTime());
-}
-
-
-function columnToLetter(column)
-{
-  var temp, letter = '';
-  while (column > 0)
-  {
-    temp = (column - 1) % 26;
-    letter = String.fromCharCode(temp + 65) + letter;
-    column = (column - temp - 1) / 26;
+  var ss = SpreadsheetApp.openByUrl(url);
+  // perform experiment on copy of spreadsheet
+  // copy is added to "Recent", not to location of original spreadsheet
+  var ss = ss.copy(ss.getName() + "_" + Date.now());
+  var sheet = ss.getActiveSheet();
+  var startDate = new Date();
+  for (i = 1; i < size; i++) {
+    var temp = sheet.getRange(i, 1);
   }
-  return letter;
+  var endDate = new Date();
+
+  return (endDate.getTime() - startDate.getTime());
 }
 
+/*  Measures time to access `size` rows in random order on the spreadsheet specified by `url`.
+    Experiment is performed on copy of the spreadsheet. */
 function random(size, url) {
-  var sheet = SpreadsheetApp.openByUrl(url).getActiveSheet();
+  var ss = SpreadsheetApp.openByUrl(url);
+  // perform experiment on copy of spreadsheet
+  // copy is added to "Recent", not to location of original spreadsheet
+  var ss = ss.copy(ss.getName() + "_" + Date.now());
+  var sheet = ss.getActiveSheet();
   var rows = [];
-  var lastColumn = sheet.getLastColumn();
-  for (i = 1; i <= lastColumn; i++) {
-    rows.push(columnToLetter(i));
+  for (i = 1; i < size; i++) {
+    rows.push(i);
   }
+  // shuffle order of rows to access
   var shuffled = shuffle(rows);
-  var result = 0;
-  var start = new Date();  
-  var resultCell = sheet.getRange(4,19)
+  var startDate = new Date();
   for (j = 0; j < shuffled.length; j++) {
-    resultCell.setFormula("=COUNT("+shuffled[j] + "1:" + shuffled[j] + size+")");
-    result += resultCell.getValue();
+    var temp = sheet.getRange(shuffled[j], 1);
   }
-  var end = new Date();
-  
-  return (end.getTime() - start.getTime());
+  var endDate = new Date();
+
+  return (endDate.getTime() - startDate.getTime());
 }
 
-function shuffle(arra1) {
-    var ctr = arra1.length, temp, index;
+/* Shuffles `array1` by swapping each element randomly */
+function shuffle(array1) {
+  var ctr = array1.length, temp, index;
 
-    while (ctr > 0) {
-        index = Math.floor(Math.random() * ctr);
-        ctr--;
-        temp = arra1[ctr];
-        arra1[ctr] = arra1[index];
-        arra1[index] = temp;
-    }
-    return arra1;
+  while (ctr > 0) {
+    index = Math.floor(Math.random() * ctr);
+    ctr--;
+    temp = array1[ctr];
+    array1[ctr] = array1[index];
+    array1[index] = temp;
+  }
+  return array1;
 }
