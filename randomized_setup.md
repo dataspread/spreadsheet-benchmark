@@ -33,7 +33,16 @@ For the desired experiment, create a new project in the Google Apps Script Home 
 
 ## Create the Python script
 
-1. Copy the python script template we provided at **TODO.** and replace it with the details specific to your project. The file structure we used was to have a separate directory for each project.
+1. Copy the python script template at `randomized_script.py` and replace it with the details specific to your project. Here is an example file structure you can use:
+```bash
+├── load
+│   ├── client_id.json
+│   └── randomized_script.py
+├── query
+│   ├── client_id.json
+│   └── randomized_script.py
+...
+```
 2. In the script, replace the value of **API_ID** with the **Current API ID** from the previous section.
 3. Move the downloaded credentials for the project to the same directory as the python script. Our file was named **client_id.json**. Whatever the credentials file name is, be sure the flow variable uses the file path that matches the credentials file.
 4. In the request object, replace the value corresponding to the function keyword with the name of the function you want to call in your Apps Script. 

@@ -112,7 +112,7 @@ Following is the benchmark organization:
 │   ├── indexing
 │   └── shared computation
 ├── .gitignore
-├── randomized-setup.md
+├── randomized_setup.md
 ├── README.md
 └── script.py
 ```
@@ -172,5 +172,5 @@ To randomize the order of dataset sizes that would run the experiment on and avo
 
 A configuration of `hello_world`, `Head`, `Time-driven`, `Minutes Timer`, and `Every minute` will run the current version of the `hello_world` function every minute. It is recommended that you configure the time interval to be greater than the runtime of your script to avoid overlap of script execution, which could lead to concurrency issues if you're using the same data.
 
-#### Method 3 (randomized-setup.md)
-Method 3 follows the same incentive with the addition of predetermining the order of the trials and increasing efficiency. In order to run the randomized trial GS scripts, refer to `randomized-setup.md`.
+#### Method 3 (randomized_setup.md)
+Method 3 follows the same incentive with the addition of predetermining the order of the trials and increasing efficiency. In order to run the randomized trial GS scripts, refer to `randomized_setup.md`.
