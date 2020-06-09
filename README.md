@@ -1,17 +1,23 @@
-# spreadsheet-benchmark
+# XXX: A Benchmark for Spreadsheet Systems
 Spreadsheet systems are used for storing and analyzing data
 across domains by programmers and non-programmers alike.
 While spreadsheet systems have continued to support
 increasingly large datasets,
 they are prone to hanging and
-freezing while performing computations even on much smaller ones.
-We have developed this benchmark
-to evaluate and compare the performance of a spreadsheet system.
-The benchmark a) measures the scalability of a spreadsheet systems
-and b) investigates how a spreadsheet system stores data and whether it adopts optimizations
+freezing while performing computations even on much smaller ones. [XXX Add link to papers]
+
+We developed an exhaustive benchmark, XXX, 
+to evaluate the performance of spreadsheet systems.
+
+Our XXX benchmark 
+* measures the scalability of spreadsheet systems for a range of canonical spreadsheet operations, and 
+* investigates how spreadsheet systems store data and whether it adopts optimizations
 to speed up computation.
-In our current release, we evaluate three popular systems, Microsoft Excel, LibreOffice Calc, and Google Sheets,
-on a range of canonical spreadsheet computation operations.
+
+Our benchmark has been implemented for three 
+popular spreadsheet systems, *Microsoft Excel*, *LibreOffice Calc*, and *Google Sheets*. [XXX provide links]
+
+Our paper has more details on the evaluation results. [XXX provide link]
 
 # Design 
 We construct two different kinds of benchmarks
@@ -23,8 +29,8 @@ and _optimization opportunities testing (OOT)_.
 ## Basic Complexity Testing (BCT) 
 The BCT benchmark aims to assess the performance of
 basic operations on spreadsheets. 
-We construct a taxonomy of operations---encapsulating
-opening, structuring, editing, and analyzing data---based on their
+We construct a taxonomy of operations-encapsulating
+opening, structuring, editing, and analyzing data-based on their
 expected time complexity, and 
 evaluate the relative performance of the spreadsheet
 systems on a range of data sizes.
