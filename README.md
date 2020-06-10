@@ -1,23 +1,20 @@
-# XXX: A Benchmark for Spreadsheet Systems
-Spreadsheet systems are used for storing and analyzing data
-across domains by programmers and non-programmers alike.
-While spreadsheet systems have continued to support
-increasingly large datasets,
-they are prone to hanging and
-freezing while performing computations even on much smaller ones. [XXX Add link to papers]
+# SpreadScale: A Benchmark for Spreadsheet Systems
+Spreadsheet systems are used for storing and analyzing data across domains by programmers and non-programmers alike.
+While spreadsheet systems have continued to support increasingly large datasets, they are prone to
+[hanging and freezing while performing computations even on much smaller ones](https://people.eecs.berkeley.edu/~adityagp/papers/dataspread-reddit.pdf). 
 
-We developed an exhaustive benchmark, XXX, 
+We developed an exhaustive benchmark, SpreadScale, 
 to evaluate the performance of spreadsheet systems.
 
-Our XXX benchmark 
+Our SpreadScale benchmark 
 * measures the scalability of spreadsheet systems for a range of canonical spreadsheet operations, and 
-* investigates how spreadsheet systems store data and whether it adopts optimizations
+* investigates how a spreadsheet system stores data and whether it adopts optimizations
 to speed up computation.
 
 Our benchmark has been implemented for three 
-popular spreadsheet systems, *Microsoft Excel*, *LibreOffice Calc*, and *Google Sheets*. [XXX provide links]
+popular spreadsheet systems, [Microsoft Excel](https://www.microsoft.com/en-us/microsoft-365/excel), [LibreOffice Calc](https://www.libreoffice.org/discover/calc/), and [Google Sheets](https://www.google.com/sheets/about/).
 
-Our paper has more details on the evaluation results. [XXX provide link]
+Our [paper](https://people.eecs.berkeley.edu/~adityagp/papers/spreadsheet_bench.pdf) has more details on the evaluation results.
 
 # Design 
 We construct two different kinds of benchmarks
@@ -28,11 +25,10 @@ and _optimization opportunities testing (OOT)_.
 
 ## Basic Complexity Testing (BCT) 
 The BCT benchmark aims to assess the performance of
-basic operations on spreadsheets. 
-We construct a taxonomy of operations-encapsulating
-opening, structuring, editing, and analyzing data-based on their
-expected time complexity, and 
-evaluate the relative performance of the spreadsheet
+basic operations on spreadsheets related to
+opening, structuring, editing, and analyzing data, based on their
+expected time complexity. The benchmark 
+evaluates the relative performance of the spreadsheet
 systems on a range of data sizes.
 
 ## Optimization Opportunities Testing (OOT) 
@@ -55,36 +51,36 @@ while performing spreadsheet formula computation.
 
 # Implementation Details
 For all three spreadsheet systems, 
-we implemented the experiments in their corresponding scripting language:
+the experiments are implemented in their corresponding scripting language:
 Visual basic (_VBA_) for Excel, 
 Calc basic for Calc, and Google apps script (_GAS_) for Google Sheets. 
 The file extension for VBA, Calc basic, and GAS scripts are _.cls_, _.bas_, and _.gs_, respectively.
 All the experiments are single-threaded. 
 
 ## Experiment files and dataset
-For each experiment in Excel, we first 
-create an Excel Macro-Enabled Workbook (_.xlsm_) 
+For each experiment in Excel, first 
+an Excel Macro-Enabled Workbook (_.xlsm_) is created
 which can execute embedded macros programmed in VBA. 
 Unlike Excel, LibreOffice Calc macros, programmed in Calc Basic, 
 can be enabled and executed from the default workbook---OpenSpreadsheet Document (_.ods_). 
-We create the Google App Scripts in 
+The Google App Scripts are created in 
 [G Suite Developer Hub](https://developers.google.com/gsuite). 
 Given an experiment, all three scripting languages can 
 invoke a formula, e.g., _COUNTIF_, or operation, e.g., _SORT_, 
 for their respective systems via an API call. 
-We used default library functions of the corresponding 
-scripting languages to measure the execution time of each experimental trial. 
-For each experiment, we passed the file path of the 
-relevant datasets as an argument for the scripts (macros) 
+The default library functions of the corresponding 
+scripting languages are used to measure the execution time of each experimental trial. 
+For each experiment, the file path of the 
+relevant datasets are passed as an argument for the scripts (macros) 
 of the desktop-based systems, and a URL for GAS in Google Sheets. 
-All the datasets used in the Excel and Calc-based experiments 
-are in _xlsx_ and _ods_ format, 
+All the datasets for the Excel and Calc-based experiments 
+should be in _xlsx_ and _ods_ format, 
 respectively. 
-The datasets used in the Google Sheets experiments are uploaded as _xlsx_ 
+The datasets for the Google Sheets experiments should be uploaded as _xlsx_ 
 files and then manually converted to Google Sheets from the Google Drive menu.
 
 ## Execution time measurement
-For each experiment, we run ten trials and report the average run time of
+For each experiment, all the scripts run ten trials and report the average run time of
 eight trials while removing the maximum and minimum reported time. 
 Note that the Google Sheets experimental settings are 
 limited by the daily quotas 
@@ -93,8 +89,8 @@ Google Apps Script services
 on some features, 
 like API calls and the number of spreadsheets 
 created and accessed. 
-As a result, for experiments with Google Sheets, 
-we restrict the number of data points, i.e., row sizes,
+Therefore, for experiments with Google Sheets, 
+restrict the number of data points, i.e., row sizes,
 to fit in the experiment trials for different test cases 
 within the allocated daily quotas
 
