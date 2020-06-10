@@ -95,7 +95,7 @@ within the allocated daily quotas
 
 # Benchmarking
 
-To get started with the _SpreadSacle_ benchmark, first clone or down the repository. 
+To get started with the _SpreadScale_ benchmark, first clone or down the repository. 
 To clone the repository use: `git clone https://github.com/dataspread/spreadsheet-benchmark.git`
 
 The `/bct` and `/oot` directories contain the BCT and OOT benchmark experiments, respectively.
