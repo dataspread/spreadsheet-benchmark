@@ -3,10 +3,10 @@ Spreadsheet systems are used for storing and analyzing data across domains by pr
 While spreadsheet systems have continued to support increasingly large datasets, they are prone to
 [hanging and freezing while performing computations even on much smaller ones](https://people.eecs.berkeley.edu/~adityagp/papers/dataspread-reddit.pdf). 
 
-We developed an exhaustive benchmark, SpreadScale, 
+We developed an exhaustive benchmark, _SpreadScale_, 
 to evaluate the performance of spreadsheet systems.
 
-Our SpreadScale benchmark 
+Our _SpreadScale_ benchmark 
 * measures the scalability of spreadsheet systems for a range of canonical spreadsheet operations, and 
 * investigates how a spreadsheet system stores data and whether it adopts optimizations
 to speed up computation.
@@ -59,19 +59,18 @@ All the experiments are single-threaded.
 
 ## Experiment files and dataset
 For each experiment in Excel, first 
-an Excel Macro-Enabled Workbook (_.xlsm_) is created
-which can execute embedded macros programmed in VBA. 
-Unlike Excel, LibreOffice Calc macros, programmed in Calc Basic, 
+create an Excel Macro-Enabled Workbook (_.xlsm_). Macro-Enabled Workbooks can execute embedded macros programmed in _VBA_. 
+Unlike Excel, LibreOffice Calc macros, programmed in _Calc Basic_, 
 can be enabled and executed from the default workbook---OpenSpreadsheet Document (_.ods_). 
-The Google App Scripts are created in 
+Create the Google App Scripts in 
 [G Suite Developer Hub](https://developers.google.com/gsuite). 
 Given an experiment, all three scripting languages can 
 invoke a formula, e.g., _COUNTIF_, or operation, e.g., _SORT_, 
 for their respective systems via an API call. 
-The default library functions of the corresponding 
+Note that the default library functions of the corresponding 
 scripting languages are used to measure the execution time of each experimental trial. 
-For each experiment, the file path of the 
-relevant datasets are passed as an argument for the scripts (macros) 
+For each experiment, pass the file path of the 
+relevant datasets as an argument for the scripts (macros) 
 of the desktop-based systems, and a URL for GAS in Google Sheets. 
 All the datasets for the Excel and Calc-based experiments 
 should be in _xlsx_ and _ods_ format, 
@@ -96,7 +95,7 @@ within the allocated daily quotas
 
 # Benchmarking
 
-To get started with the _spreadsheet-benchmark_, first clone or down the repository. 
+To get started with the _SpreadSacle_ benchmark, first clone or down the repository. 
 To clone the repository use: `git clone https://github.com/dataspread/spreadsheet-benchmark.git`
 
 The `/bct` and `/oot` directories contain the BCT and OOT benchmark experiments, respectively.
