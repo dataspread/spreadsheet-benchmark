@@ -1,12 +1,12 @@
-# SheetPerf: A Benchmark for Spreadsheet Systems
+# sheetperf: A Benchmark for Spreadsheet Systems
 Spreadsheet systems are used for storing and analyzing data across domains by programmers and non-programmers alike.
 While spreadsheet systems have continued to support increasingly large datasets, they are prone to
 [hanging and freezing while performing computations even on much smaller ones](https://people.eecs.berkeley.edu/~adityagp/papers/dataspread-reddit.pdf). 
 
-We developed an exhaustive benchmark, _SheetPerf_, 
+We developed an exhaustive benchmark, _sheetperf_, 
 to evaluate the performance of spreadsheet systems.
 
-Our _SheetPerf_ benchmark 
+Our _sheetperf_ benchmark 
 * measures the scalability of spreadsheet systems for a range of canonical spreadsheet operations, and 
 * investigates how a spreadsheet system stores data and whether it adopts optimizations
 to speed up computation.
@@ -95,7 +95,7 @@ within the allocated daily quotas
 
 # Benchmarking
 
-To get started with the _SheetPerf_ benchmark, first clone or down the repository. 
+To get started with the _sheetperf_ benchmark, first clone or down the repository. 
 To clone the repository use: `git clone https://github.com/dataspread/spreadsheet-benchmark.git`
 
 The `/bct` and `/oot` directories contain the BCT and OOT benchmark experiments, respectively.
