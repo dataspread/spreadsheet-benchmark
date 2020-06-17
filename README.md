@@ -175,3 +175,7 @@ A configuration of `hello_world`, `Head`, `Time-driven`, `Minutes Timer`, and `E
 
 #### Method 3 (randomized_setup.md)
 Method 3 follows the same incentive with the addition of predetermining the order of the trials and increasing efficiency. To run the randomized trial GS scripts, refer to [randomized_setup.md](randomized_setup.md).
+
+License
+---
+MIT
